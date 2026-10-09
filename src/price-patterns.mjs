@@ -4,11 +4,13 @@ export function pricePatternContext(bars){
   const consecutive=rows=>rows.every((bar,i)=>!i||Date.parse(bar.time)-Date.parse(rows[i-1].time)===900000);
   const pivotReady=fractal.length===5&&consecutive(bars.slice(-6));
   const priorChannel=bars.slice(-22,-2);
+  const retestChannel=bars.slice(-23,-3),retestReady=retestChannel.length===20&&consecutive(bars.slice(-23));
   return {fractalHigh:pivotReady&&fractal.every((bar,i)=>i===2||pivot.high>bar.high)?pivot.high:null,
     fractalLow:pivotReady&&fractal.every((bar,i)=>i===2||pivot.low<bar.low)?pivot.low:null,
     failedBreakHigh:priorChannel.length===20&&consecutive(bars.slice(-22))?Math.max(...priorChannel.map(bar=>bar.high)):null,
     failedBreakLow:priorChannel.length===20&&consecutive(bars.slice(-22))?Math.min(...priorChannel.map(bar=>bar.low)):null,
     threeBarContiguous:consecutive(bars.slice(-3)),pullbackFirst:bars.at(-3),
+    retestHigh:retestReady?Math.max(...retestChannel.map(b=>b.high)):null,retestLow:retestReady?Math.min(...retestChannel.map(b=>b.low)):null,
     twoBarContiguous:Date.parse(x.time)-Date.parse(p.time)===900000,
     previousNr7:window.length===7&&window.every((bar,i)=>!i||Date.parse(bar.time)-Date.parse(window[i-1].time)===900000)&&p.high>p.low&&window.slice(0,-1).every(bar=>p.high-p.low<bar.high-bar.low),
     currentNr7:bars.slice(-7).every((bar,i,a)=>!i||Date.parse(bar.time)-Date.parse(a[i-1].time)===900000)&&x.high>x.low&&bars.slice(-7,-1).every(bar=>x.high-x.low<bar.high-bar.low)};
@@ -19,6 +21,12 @@ export function pricePatternChecks(q,id){
   const trendBuy=q.e21>q.e50&&q.e21>q.previousE21&&x.close>q.e21;
   const trendSell=q.e21<q.e50&&q.e21<q.previousE21&&x.close<q.e21;
   const common=[c('Deux bougies 15 min consécutives',q.twoBarContiguous),c('Corps courant ≥ 0,25 ATR',Math.abs(x.close-x.open)>=.25*q.atr)];
+  if(id==='breakout-retest'){
+    const first=q.pullbackFirst;
+    return {
+      BUY:[...common,c('Cassure clôturée du canal 20 antérieur',Number.isFinite(q.retestHigh)&&first?.close>q.retestHigh),c('Retest du sommet sans clôture sous le niveau',Number.isFinite(q.retestHigh)&&p.low<=q.retestHigh&&p.close>q.retestHigh&&p.close<first.close),c('Confirmation haussière au-dessus du retest',bull&&x.close>p.high),c('Tendance EMA 21/50 haussière',trendBuy)],
+      SELL:[...common,c('Cassure clôturée du canal 20 antérieur',Number.isFinite(q.retestLow)&&first?.close<q.retestLow),c('Retest du creux sans clôture au-dessus du niveau',Number.isFinite(q.retestLow)&&p.high>=q.retestLow&&p.close<q.retestLow&&p.close>first.close),c('Confirmation baissière sous le retest',bear&&x.close<p.low),c('Tendance EMA 21/50 baissière',trendSell)]};
+  }
   if(id==='two-bar-pullback'){
     const first=q.pullbackFirst;
     return {

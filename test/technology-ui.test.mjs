@@ -9,6 +9,13 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
+test('LDA detail marks one selected shrinkage; stability stays collapsed and cannot suggest a win rate',()=>{
+  const b=browser(),s=fixture(null);b.state(s);
+  b.context.auditModel={algorithm:'regularized-lda',selection:{selected:'regularized-lda',selectedShrinkage:.9,candidates:[{algorithm:'regularized-lda',shrinkage:.25,brier:.5},{algorithm:'regularized-lda',shrinkage:.9,brier:.4}]},test:{robustness:{status:'available',nonOverlapping:{sample:10,brier:.4,baselineBrier:.6},segments:[{part:1,sample:12,brier:.3},{part:2,sample:12,brier:.4},{part:3,sample:12,brier:.5}]}}};
+  const html=b.eval('aiModelDetails(selected(),{algorithm:"regularized-lda"},auditModel)');assert.equal((html.match(/class="chosen"/g)??[]).length,1);assert.match(html,/0,90 ✓/);
+  const stability=b.eval('modelRobustness(auditModel)');assert.match(stability,/<details class="ai-method" data-key="model-robustness">/);assert.doesNotMatch(stability,/<details[^>]*open/);assert.match(stability,/ne sont pas un taux de trades gagnants/);assert.match(stability,/Période 3/);assert.equal(b.eval('modelRobustness(null)'),'');
+});
+
 const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8').replace(/^import \{SignalAlertTracker\} from '\/signal-alerts\.js';\r?\n/,'');
 const alerts=readFileSync(new URL('../public/signal-alerts.js',import.meta.url),'utf8').replace('export class SignalAlertTracker','class SignalAlertTracker');
 const START=Date.parse('2026-10-08T14:01:00.000Z'),iso=t=>new Date(t).toISOString();

@@ -8,7 +8,7 @@ const candles=values=>values.map((close,i)=>({time:new Date(Date.UTC(2026,0,1)+i
 const flat=()=>candles(Array(80).fill(100));
 test('the eight additional rules are real catalogue entries',()=>{
   for(const id of ids)assert.ok(strategies.some(s=>s.id===id),id);
-  assert.equal(strategies.length,41);
+  assert.equal(strategies.length,42);
 });
 test('the eight additional indicators are finite and flat prices create no signal',()=>{
   const q=indicators(flat());

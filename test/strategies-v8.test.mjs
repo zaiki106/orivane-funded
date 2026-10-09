@@ -7,7 +7,7 @@ const ids=['kama-reclaim','ppo','ultimate-recovery','smi','stoch-rsi','elder-ray
 const candles=values=>values.map((close,i)=>({time:new Date(Date.UTC(2026,0,1)+i*900000).toISOString(),open:values[i-1]??close,high:Math.max(close,values[i-1]??close)+.1,low:Math.min(close,values[i-1]??close)-.1,close,volume:0}));
 const near=(actual,expected,tolerance=1e-9)=>assert.ok(Math.abs(actual-expected)<tolerance,`${actual} differs from independently derived ${expected}`);
 test('v8 adds eight named causal rules without enlarging the analysis window',()=>{
-  assert.equal(strategies.length,41);assert.equal(analysisWindow,160);
+  assert.equal(strategies.length,42);assert.equal(analysisWindow,160);
   for(const id of ids)assert.ok(strategies.some(rule=>rule.id===id),id);
 });
 test('v8 indicator arithmetic matches a constant history and a known impulse',()=>{

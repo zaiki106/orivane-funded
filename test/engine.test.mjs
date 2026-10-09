@@ -9,7 +9,7 @@ const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url
 test('backtest is causal and charges transaction costs',()=>{const original=backtest(dataset.bars,'breakout',{end:400}),modified=structuredClone(dataset.bars);for(let i=400;i<modified.length;i++)for(const k of ['open','high','low','close'])modified[i][k]*=3;assert.deepEqual(backtest(modified,'breakout',{end:400}),original);const gross=backtest(dataset.bars,'breakout',{feeBps:0,slippageBps:0}),net=backtest(dataset.bars,'breakout',{feeBps:2,slippageBps:2});assert.ok(gross.n>0);assert.equal(gross.n,net.n);assert.ok(net.totalR<gross.totalR);for(const t of net.trades)assert.ok(Date.parse(t.exitTime)>=Date.parse(t.time));});
 test('final test data cannot alter the strategy selected on validation',()=>{const first=laboratory(dataset),changed=structuredClone(dataset);for(let i=Math.floor(changed.bars.length*.75);i<changed.bars.length;i++)for(const k of ['open','high','low','close'])changed.bars[i][k]*=2;const second=laboratory(changed);assert.equal(first.selected,second.selected);assert.deepEqual(first.results.map(r=>r.validation),second.results.map(r=>r.validation));for(const r of first.results)if(r.id===first.selected)assert.ok(r.validation.n>=20&&r.validation.expectancy>0);});
 test('thirty-six real strategy rules expose actual checks and criteria readiness',()=>{
-  assert.equal(strategies.length,41);
+  assert.equal(strategies.length,42);
   for(const s of strategies){
     const bars=Array.from({length:80},(_,i)=>({time:new Date(Date.UTC(2026,0,1)+i*900000).toISOString(),open:100,high:101,low:99,close:100,volume:100}));
     const result=signal(bars,s.id);
@@ -71,7 +71,7 @@ test('every strategy is causal before a future boundary, including the new cross
 });
 
 test('all fourteen original strategies find both directions in the fixed historical dataset',()=>{
-  for(const s of strategies.slice(0,14)){const observed=new Set();for(let i=60;i<dataset.bars.length;i++){observed.add(signal(dataset.bars.slice(0,i+1),s.id).side);if(observed.has('BUY')&&observed.has('SELL'))break;}assert.ok(observed.has('BUY')&&observed.has('SELL'),s.id);}
+  for(const s of strategies.filter(s=>['pullback','breakout','reversion','ema-cross','macd','rsi-recovery','squeeze','vwap','supertrend','stochastic','inside-bar','liquidity-sweep','continuation','keltner-reentry'].includes(s.id))){const observed=new Set();for(let i=60;i<dataset.bars.length;i++){observed.add(signal(dataset.bars.slice(0,i+1),s.id).side);if(observed.has('BUY')&&observed.has('SELL'))break;}assert.ok(observed.has('BUY')&&observed.has('SELL'),s.id);}
 });
 
 const expandedFixtures={

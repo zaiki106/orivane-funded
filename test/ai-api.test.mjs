@@ -7,8 +7,8 @@ import {calibrateDecision} from '../src/decision.mjs';
 test('the public AI contract names the selected trained classifier and exposes comparison without its internal training bank',async()=>{
   const history=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url))),closeStart=Math.floor(Date.now()/900000)*900000-900000,shift=closeStart-Date.parse(history.bars.at(-1).time),bars=history.bars.map(b=>({...b,time:new Date(Date.parse(b.time)+shift).toISOString()}));
   const fixture={symbol:'BTC/USD',source:'Historical AI integration fixture',timeframe:15,live:true,bars,quote:{price:bars.at(-1).close,receivedAt:new Date().toISOString()}},trained=calibrateDecision(fixture);
-  assert.equal(trained.status,'estimate');assert.equal(trained.selection.candidates.length,9);
-  assert.deepEqual([...new Set(trained.selection.candidates.map(c=>c.algorithm))].sort(),['multinomial-logistic','neural-network','regularized-qda','weighted-knn']);
+  assert.equal(trained.status,'estimate');assert.equal(trained.selection.candidates.length,11);
+  assert.deepEqual([...new Set(trained.selection.candidates.map(c=>c.algorithm))].sort(),['multinomial-logistic','neural-network','regularized-lda','regularized-qda','weighted-knn']);
   const pool=options=>({schedule:(dataset,version)=>options.onCalibration({symbol:dataset.symbol,source:dataset.source,version,calibration:trained,trainedAt:new Date().toISOString()}),snapshot:()=>({active:0,queued:0,concurrency:2}),close:async()=>{}});
   const app=createApp({dbPath:':memory:',network:false,initialDatasets:[fixture],importsPath:'',modelPoolFactory:pool});
   try{
@@ -21,7 +21,7 @@ test('the public AI contract names the selected trained classifier and exposes c
     assert.equal(publicModel.calibrated,trained.algorithm!=='weighted-knn');
     for(const key of ['weights','scaler','neighbors','neural','discriminant','samples','features','covariance','cholesky'])assert.ok(!(key in publicModel));
     assert.equal(market.decision.confidence.algorithm,trained.algorithm);
-    assert.equal(state.strategyCatalog.length,41);assert.ok(state.strategyCatalog.some(s=>s.id==='ichimoku'));
+    assert.equal(state.strategyCatalog.length,42);assert.ok(state.strategyCatalog.some(s=>s.id==='ichimoku'));
     assert.ok(market.decision.confidence.neighboursDetail.every(n=>!('features'in n)&&Date.parse(n.labelEndTime)<=Date.parse(trained.trainedThrough)));
   }finally{await app.close();}
 });

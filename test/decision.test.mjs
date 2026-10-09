@@ -5,8 +5,31 @@ import {routeStrategy,calibrateDecision,decide,aggregateH1,higherTimeframe,label
 import {signal,strategies} from '../src/engine.mjs';
 import {fitRegularizedQDA} from '../src/regularized-qda.mjs';
 import {fitNeuralNetwork,predictNeuralNetwork} from '../src/neural-network.mjs';
+import {fitRegularizedLDA,predictRegularizedLDA} from '../src/regularized-lda.mjs';
 const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url)));
 const model=calibrateDecision(dataset);
+
+test('LDA parameters fit train only; calibration selects the variant and separate test exposes stability',()=>{
+  const samples=classificationSamples(dataset.bars),train=samples.filter(r=>r.index<model.split.train.end&&r.labelEndIndex<model.split.train.end),calibration=samples.filter(r=>r.index>=model.split.calibration.start&&r.labelEndIndex<model.split.calibration.end);
+  const candidates=model.selection.candidates.filter(c=>c.algorithm==='regularized-lda');assert.equal(candidates.length,2);
+  for(const c of candidates){
+    const fitted=fitRegularizedLDA(train,model.scaler,{shrinkage:c.shrinkage});
+    const brier=calibration.reduce((sum,r)=>sum+predictRegularizedLDA(r.features,fitted,model.scaler,{temperature:c.temperature}).reduce((s,p,k)=>s+(p-(classes[k]===r.label?1:0))**2,0),0)/calibration.length;
+    assert.ok(Math.abs(c.brier-brier)<1e-12);
+    if(c===candidates.reduce((a,b)=>a.brier<b.brier?a:b))assert.deepEqual(model.linearDiscriminant,fitted);
+  }
+  assert.equal(model.test.robustness.doesNotSelectModel,true);assert.equal(model.test.robustness.nonOverlapping.independenceAssumed,false);
+  assert.equal(model.test.robustness.segments.reduce((s,r)=>s+r.sample,0),model.test.sample);
+});
+
+test('LDA confidence runs the selected covariance and preserves strict publication and data guards',()=>{
+  const lda={...structuredClone(model),algorithm:'regularized-lda',temperature:2,calibrated:true},sample=classificationSamples(dataset.bars).at(-1),prefix=dataset.bars.slice(0,sample.index+1);
+  const expected=predictRegularizedLDA(sample.features,lda.linearDiscriminant,lda.scaler,{temperature:2}),actual=predictMarketClass(prefix,lda);
+  classes.forEach((label,k)=>assert.equal(actual[label],expected[k]));
+  const d=decide(prefix,lda);assert.equal(d.confidence.algorithm,'regularized-lda');assert.ok(d.side==='HOLD'||d.confidence.percent>60);
+  assert.equal(decide(prefix,lda,{fresh:false}).confidence.percent,null);assert.equal(predictMarketClass(prefix,{...lda,linearDiscriminant:null}),null);
+  const broken=structuredClone(lda);broken.linearDiscriminant.classPrior=[.1,.1,.8];assert.equal(predictMarketClass(prefix,broken),null);assert.equal(decide(prefix,broken).side,'HOLD');
+});
 test('decision chooses exactly one regime rule and exposes a separate three-class probability',()=>{
   const decision=decide(dataset.bars,model);
   assert.ok(['BUY','SELL','HOLD'].includes(decision.side));
@@ -139,12 +162,12 @@ test('model reports all class samples, frozen holdout scoring and finite probabi
   assert.deepEqual(calibrateDecision(dataset),model);
 });
 
-test('one classifier is selected by calibration Brier among four families and nine independent variants',()=>{
-  assert.equal(decisionVersion,'regime-classifier-v4');
-  assert.ok(['multinomial-logistic','weighted-knn','regularized-qda','neural-network'].includes(model.algorithm));
+test('one classifier is selected by calibration Brier among five families and eleven independent variants',()=>{
+  assert.equal(decisionVersion,'regime-classifier-v5');
+  assert.ok(['multinomial-logistic','weighted-knn','regularized-qda','neural-network','regularized-lda'].includes(model.algorithm));
   assert.equal(model.selection.metric,'brier');assert.equal(model.selection.partition,'calibration');
   assert.equal(model.selection.holdoutUsed,false);assert.equal(model.selection.trainingRefit,false);
-  assert.deepEqual(model.selection.candidates.map(candidate=>[candidate.algorithm,candidate.k,candidate.shrinkage,candidate.hiddenUnits]),[['multinomial-logistic',null,null,null],['weighted-knn',15,null,null],['weighted-knn',31,null,null],['weighted-knn',61,null,null],['regularized-qda',null,.25,null],['regularized-qda',null,.5,null],['regularized-qda',null,.9,null],['neural-network',null,null,8],['neural-network',null,null,16]]);
+  assert.deepEqual(model.selection.candidates.map(candidate=>[candidate.algorithm,candidate.k,candidate.shrinkage,candidate.hiddenUnits]),[['multinomial-logistic',null,null,null],['weighted-knn',15,null,null],['weighted-knn',31,null,null],['weighted-knn',61,null,null],['regularized-qda',null,.25,null],['regularized-qda',null,.5,null],['regularized-qda',null,.9,null],['neural-network',null,null,8],['neural-network',null,null,16],['regularized-lda',null,.25,null],['regularized-lda',null,.9,null]]);
   const best=model.selection.candidates.reduce((winner,candidate)=>candidate.brier<winner.brier?candidate:winner);
   assert.equal(model.algorithm,best.algorithm);assert.equal(model.selection.selectedK,best.k);assert.equal(model.selection.selectedShrinkage,best.shrinkage);assert.equal(model.selection.selectedHiddenUnits,best.hiddenUnits);
   assert.equal(model.calibration.brier,best.brier);
@@ -157,7 +180,7 @@ test('changing the holdout cannot select another classifier or neighbor count',(
   const changed=structuredClone(dataset);
   for(let i=model.split.calibration.end;i<changed.bars.length;i++)for(const key of ['open','high','low','close'])changed.bars[i][key]*=1.2+(i%7)*.02;
   const second=calibrateDecision(changed);
-  for(const key of ['algorithm','selection','neighbors','weights','scaler','temperature','calibration','discriminant','neural'])assert.deepEqual(second[key],model[key],key);
+  for(const key of ['algorithm','selection','neighbors','weights','scaler','temperature','calibration','discriminant','neural','linearDiscriminant'])assert.deepEqual(second[key],model[key],key);
   assert.notDeepEqual(second.test,model.test);
 });
 

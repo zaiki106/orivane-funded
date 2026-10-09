@@ -1,3 +1,5 @@
+import {auditProbabilityRows} from './probability-audit.mjs';
+import {fitRegularizedLDA,predictRegularizedLDA,validLinearDiscriminant,ldaAlgorithm} from './regularized-lda.mjs';
 import {pricePatternChecks} from './price-patterns.mjs';
 import {executionPlan} from './execution-plan.mjs';
 import {indicators,signal,analysisWindow} from './engine.mjs';
@@ -8,7 +10,7 @@ import {fitNeuralNetwork,predictNeuralNetwork,validNeuralModel,neuralAlgorithm} 
 
 export const classes=['UP','DOWN','FLAT'];
 export const featureNames=['return1Atr','return4Atr','return12Atr','emaFastAtr','emaSlowAtr','rsiCentered','macdHistogramAtr','atrFraction','bandPosition','logVolumeRatio','volumeAvailable','h1Direction','h1Available'];
-export const decisionVersion='regime-classifier-v4';
+export const decisionVersion='regime-classifier-v5';
 export const featureWindow=analysisWindow;
 export const signalPolicy=Object.freeze({id:'confidence-above-60-v1',minimumPercent:60,comparison:'>'});
 const version=decisionVersion;
@@ -51,7 +53,7 @@ function routeFrom(q,h1,router){
   const x=q.last,p=q.previous,compression=q.previousBand.width>0&&q.previousBand.width<=q.squeezeThreshold*.9,body=Math.abs(x.close-x.open),bull=x.close>x.open,bear=x.close<x.open,volumeOK=!q.hasVolume||q.volumeRatio>=1.2,expanded=x.high-x.low>q.atr*.8;
   // Fixed regime + observable structure precedence, before evaluating ONE rule.
   // Compression without a break is a context, not a completed squeeze setup.
-  const patternReasons={'nr7-breakout':'NR7 strict terminé puis cassure dans la tendance','engulfing-reclaim':'Engloutissement du repli puis reprise EMA 21 confirmée','fractal-breakout':'Fractale confirmée puis premier franchissement en clôture','failed-breakout':'Cassure échouée puis réintégration du canal en clôture','two-bar-pullback':'Deux bougies de repli puis rupture des extrêmes en tendance EMA 21/50'};
+  const patternReasons={'breakout-retest':'Cassure du canal 20 puis retest tenu et clôture de confirmation','nr7-breakout':'NR7 strict terminé puis cassure dans la tendance','engulfing-reclaim':'Engloutissement du repli puis reprise EMA 21 confirmée','fractal-breakout':'Fractale confirmée puis premier franchissement en clôture','failed-breakout':'Cassure échouée puis réintégration du canal en clôture','two-bar-pullback':'Deux bougies de repli puis rupture des extrêmes en tendance EMA 21/50'};
   for(const id of Object.keys(patternReasons)){const checks=pricePatternChecks(q,id);if(checks.BUY.every(c=>c.passed)||checks.SELL.every(c=>c.passed))return make(id,'Price structure',patternReasons[id]);}
   if(q.insideBar&&q.patternContiguous&&(x.close>q.mother.high||x.close<q.mother.low)&&x.high-x.low>=q.atr*.5)return make('inside-bar','Compression breakout','Clôture hors de la mère après une bougie intérieure stricte');
   if(q.trend<1.2&&(x.low<q.low&&x.close>q.low&&bull&&Math.min(x.open,x.close)-x.low>=body||x.high>q.high&&x.close<q.high&&bear&&x.high-Math.max(x.open,x.close)>=body))return make('liquidity-sweep','Rejection','Mèche hors du canal passé puis réintégration directionnelle');
@@ -152,6 +154,7 @@ function softmax(logits,temperature=1){const scaled=logits.map(x=>x/temperature)
 function neighborPrediction(features,model,excludeIndex=null){return predictNearestNeighbors(features,{...model.neighbors,k:model.neighborCount??model.neighbors?.k},model.scaler,{excludeIndex});}
 function probabilities(features,model,temperature=model.temperature??1,excludeIndex=null){
   if(model.algorithm===neighborAlgorithm)return neighborPrediction(features,model,excludeIndex)?.probabilities??null;
+  if(model.algorithm===ldaAlgorithm)return predictRegularizedLDA(features,model.linearDiscriminant,model.scaler,{temperature});
   if(model.algorithm===qdaAlgorithm)return predictRegularizedQDA(features,model.discriminant,model.scaler,{temperature});
   if(model.algorithm===neuralAlgorithm)return predictNeuralNetwork(features,model.neural,model.scaler,{temperature});
   const x=transform(features,model.scaler);return softmax(model.weights.map(row=>row.reduce((sum,weight,j)=>sum+weight*x[j],0)),temperature);
@@ -190,7 +193,7 @@ export function calibrateDecision(dataset,options={}){
   const router={trendThreshold:clip(quantile(trainingPoints.map(r=>r.trend),.5)??.8,.65,1.2),highVolatilityThreshold:quantile(trainingPoints.map(r=>r.atrFraction),.75),fittedThrough:closeTime(trainEnd-1)};
   const range=rows=>({from:rows[0]?.time??null,to:rows.at(-1)?.labelEndTime??null,sample:rows.length,classSamples:counts(rows)});
   const model={version,symbol:dataset.symbol??null,source:dataset.source??null,timeframe:config.timeframe,featureWindow,featureNames:[...featureNames],classes:[...classes],cost:config.cost,router,event:{kind:'market_class_probability',description:'Direction nette à '+(config.horizonBars*config.timeframe)+' min',horizonBars:config.horizonBars,horizonMinutes:config.horizonBars*config.timeframe,neutralAtr:config.neutralAtr,definition:'UP/DOWN si le rendement clôture à clôture dépasse ±('+config.neutralAtr+' ATR initial / cours initial + coûts aller-retour), sinon FLAT'},split:{fractions:[.5,.25,.25],gapBars:gap,train:{start:0,end:trainEnd},calibration:{start:trainEnd+gap,end:calibrationEnd},test:{start:calibrationEnd+gap,end:n},bars:n,discardedHistory:all.length-n},trainingRange:range(train),calibrationRange:range(calibration),testRange:range(test),trainedThrough:closeTime(trainEnd-1),calibratedThrough:closeTime(calibrationEnd-1),asOf:closeTime(n-1),status:'insufficient',reason:'Historique ou classes trop peu représentés',calibrated:false,audited:false,scaler:null,weights:null,temperature:null,classPrior:null,training:null,calibration:null,test:null};
-  Object.assign(model,{algorithm:null,selection:null,neighbors:null,neighborCount:null,logisticTemperature:null,discriminant:null,neural:null});
+  Object.assign(model,{algorithm:null,selection:null,neighbors:null,neighborCount:null,logisticTemperature:null,discriminant:null,neural:null,linearDiscriminant:null});
   const enough=train.length>=config.minTrainSamples&&calibration.length>=config.minCalibrationSamples&&classes.every(label=>counts(train)[label]>=config.minClassSamples&&counts(calibration)[label]>=config.minCalibrationClassSamples);
   if(!enough)return model;
   model.algorithm='multinomial-logistic';
@@ -240,10 +243,21 @@ export function calibrateDecision(dataset,options={}){
     candidates.push(candidate);
     if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;model.neural=neural;}
   }
+  let bestLdaBrier=Infinity;
+  for(const shrinkage of [.25,.9]){
+    const linearDiscriminant=fitRegularizedLDA(train,model.scaler,{shrinkage});if(!linearDiscriminant)continue;
+    const candidateModel={...model,algorithm:ldaAlgorithm,linearDiscriminant,temperature:1};
+    let temperature=1,loss=diagnostics(calibration,candidateModel,1).logLoss;
+    for(let i=0;i<=40;i++){const next=Math.exp(Math.log(.25)+i*Math.log(16)/40),nextLoss=diagnostics(calibration,candidateModel,next).logLoss;if(nextLoss<loss){loss=nextLoss;temperature=next;}}
+    const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:ldaAlgorithm,k:null,shrinkage,hiddenUnits:null,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
+    candidates.push(candidate);if(candidate.brier<bestLdaBrier){model.linearDiscriminant=linearDiscriminant;bestLdaBrier=candidate.brier;}
+    if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
+  }
   model.algorithm=selected.algorithm;model.neighborCount=selected.k;model.temperature=selected.temperature;
   model.selection={metric:'brier',partition:'calibration',selected:selected.algorithm,selectedK:selected.k,selectedShrinkage:selected.shrinkage,selectedHiddenUnits:selected.hiddenUnits,trainingRefit:false,holdoutUsed:false,candidates};
   model.training=diagnostics(train,model,1,{excludeTrainingSelf:model.algorithm===neighborAlgorithm});model.training.predictionMode=model.algorithm===neighborAlgorithm?'leave-one-out':'resubstitution';
   model.calibration=selectedCalibration;model.test=diagnostics(test,model);
+  model.test.robustness=auditProbabilityRows(test.map(row=>({...row,probabilities:probabilities(row.features,model)})),model.classPrior);
   model.training.labelCoverage=train.length/Math.max(1,trainEnd-gap-59);model.calibration.labelCoverage=calibration.length/Math.max(1,calibrationEnd-trainEnd-2*gap);model.test.labelCoverage=test.length/Math.max(1,n-calibrationEnd-2*gap);
   model.status='estimate';model.reason='Un seul classifieur sélectionné sur validation ; diagnostic final séparé des paramètres';model.calibrated=model.algorithm!==neighborAlgorithm;model.calibrationMethod=model.calibrated?'temperature-scaling':'neighbor-count-validation';model.audited=test.length>=config.minTestSamples;
   return model;
@@ -255,9 +269,10 @@ export function predictMarketClass(bars,model){
   if(!Array.isArray(model.classes)||model.classes.join(',')!==classes.join(',')||!Number.isFinite(Date.parse(model.calibratedThrough)))return null;
   if(!Array.isArray(model.weights)||model.weights.length!==3||model.weights.some(row=>!Array.isArray(row)||row.length!==featureNames.length+1||row.some(x=>!Number.isFinite(x))))return null;
   if(!Array.isArray(model.scaler?.mean)||model.scaler.mean.length!==featureNames.length||model.scaler.mean.some(x=>!Number.isFinite(x))||!Array.isArray(model.scaler.scale)||model.scaler.scale.length!==featureNames.length||model.scaler.scale.some(x=>!Number.isFinite(x)||x<=0))return null;
-  if(model.algorithm!==undefined&&!['multinomial-logistic',neighborAlgorithm,qdaAlgorithm,neuralAlgorithm].includes(model.algorithm))return null;
+  if(model.algorithm!==undefined&&!['multinomial-logistic',neighborAlgorithm,qdaAlgorithm,neuralAlgorithm,ldaAlgorithm].includes(model.algorithm))return null;
   if(model.algorithm===neighborAlgorithm&&!validNeighborModel({...model.neighbors,k:model.neighborCount??model.neighbors?.k},featureNames.length))return null;
   if(model.algorithm===qdaAlgorithm&&!validDiscriminantModel(model.discriminant,featureNames.length))return null;
+  if(model.algorithm===ldaAlgorithm&&!validLinearDiscriminant(model.linearDiscriminant,featureNames.length))return null;
   if(model.algorithm===neuralAlgorithm&&!validNeuralModel(model.neural,featureNames.length))return null;
   if(Date.parse(model.calibratedThrough)>asOf)return null;
   const p=probabilities(point.features,model);if(!Array.isArray(p)||p.length!==3||p.some(value=>!Number.isFinite(value)||value<0||value>1)||Math.abs(p.reduce((a,b)=>a+b,0)-1)>1e-9)return null;

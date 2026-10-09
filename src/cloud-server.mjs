@@ -16,8 +16,8 @@ export async function createCloudApp({origin,password,terminalOptions={}}={}){
   const upstreamPort=app.server.address().port;
   const server=http.createServer((req,res)=>{
     const reply=(status,message,headers={})=>{res.writeHead(status,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers});res.end(message);};
-    if(req.headers.host!==publicUrl.host||req.headers['sec-fetch-site']==='cross-site'||(req.headers.origin&&req.headers.origin!==publicUrl.origin))return reply(403,'Origine refusée');
     if(req.method==='GET'&&req.url==='/healthz')return reply(200,'ok');
+    if(req.headers.host!==publicUrl.host||req.headers['sec-fetch-site']==='cross-site'||(req.headers.origin&&req.headers.origin!==publicUrl.origin))return reply(403,'Origine refusée');
     const auth=req.headers.authorization??'';
     const raw=/^Basic [A-Za-z0-9+/]+={0,2}$/.test(auth)?Buffer.from(auth.slice(6),'base64').toString('utf8'):'';
     if(!timingSafeEqual(createHash('sha256').update(raw).digest(),expected))return reply(401,'Connexion privée Orivane',{'WWW-Authenticate':'Basic realm="Orivane", charset="UTF-8"'});
@@ -42,3 +42,4 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
   app.server.listen(port,'0.0.0.0',()=>{console.log('Orivane cloud privé : serveur démarré');app.terminal.refresh().catch(()=>{});});
   for(const event of ['SIGINT','SIGTERM'])process.once(event,async()=>{await app.close();process.exit(0);});
 }
+

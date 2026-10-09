@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: orivane-funded
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm run check
+    startCommand: node src/cloud-server.mjs
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: ORIVANE_ACCESS_PASSWORD
+        sync: false

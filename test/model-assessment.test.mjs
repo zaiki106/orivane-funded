@@ -4,6 +4,13 @@ import {applyModelAssessment,assessModel} from '../src/model-assessment.mjs';
 const decision={side:'BUY',entry:100,stop:98,target:104,setup:{confirmed:true,entry:100,stop:98,target:104},confidence:{percent:80,classProbs:{UP:.8,DOWN:.1,FLAT:.1},status:'estimate'},confidenceGate:{candidatePercent:80,passed:true}};
 const model={audited:true,test:{sample:100,brier:.4,baselineBrier:.5}};
 
+test('rejected evidence replaces an unpublished candidate percentage with the actual model block',()=>{
+  const held={...decision,side:'HOLD',reason:'Confiance SELL 12,0 % · seuil > 60 %',filteredByConfidence:true};
+  const result=applyModelAssessment(held,{...model,test:{...model.test,brier:.6}});
+  assert.equal(result.reason,result.modelAssessment.reason);assert.doesNotMatch(result.reason,/12,0|%/);
+  assert.equal(result.confidenceGate.candidatePercent,null);assert.equal(result.side,'HOLD');
+});
+
 test('failed evidence does not mask an existing execution block or publish confidence',()=>{
   const rejected={...model,test:{...model.test,brier:.6}};
   for(const reason of ['Objectif déjà atteint par le cours actuel','Cours indisponibles ou périmés','Filtre H1 opposé au signal BUY']){

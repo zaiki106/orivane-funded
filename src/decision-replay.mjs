@@ -1,13 +1,13 @@
 import {decide} from './decision.mjs';
 import {exitPrice,metrics} from './engine.mjs';
-import {costForSymbol} from './cost-policy.mjs';
+import {costForSymbol,roundTripFee} from './cost-policy.mjs';
 
 // Frozen model, chronological held-out candles, one position at a time.
 // The end-of-test model assessment is deliberately NOT fed back into past decisions.
 export function replayDecisions(dataset,model,{costMultiplier=1}={}){
   if(!Number.isFinite(costMultiplier)||costMultiplier<1||costMultiplier>4)throw Error('Scénario de coûts invalide');
   const bars=(dataset.bars??[]).filter(b=>b.closed!==false),interval=900000;
-  const baseCost=costForSymbol(dataset.symbol),cost={...baseCost,feeBps:baseCost.feeBps*costMultiplier,slippageBps:baseCost.slippageBps*costMultiplier};
+  const baseCost=costForSymbol(dataset.symbol),cost={...baseCost,feeBps:baseCost.feeBps*costMultiplier,slippageBps:baseCost.slippageBps*costMultiplier,...(baseCost.feePerUnit!==undefined?{feePerUnit:baseCost.feePerUnit*costMultiplier}:{})};
   const base={kind:'frozen-model-replay',symbol:dataset.symbol,source:dataset.source,
     from:bars[0]?.time??null,to:bars.at(-1)?.time??null,bars:bars.length,
     cost,costMultiplier,horizonBars:model?.event?.horizonBars??4,
@@ -22,7 +22,7 @@ export function replayDecisions(dataset,model,{costMultiplier=1}={}){
   let position=null;
   function finish(bar,out){
     const dir=position.side==='BUY'?1:-1,exit=out.price*(1-dir*base.cost.slippageBps/10000);
-    const net=dir*(exit-position.entry)-(position.entry+exit)*base.cost.feeBps/10000;
+    const net=dir*(exit-position.entry)-roundTripFee(base.cost,position.entry,exit);
     trades.push({...position,exit,exitBarTime:bar.time,exitTime:new Date(Date.parse(bar.time)+(out.atOpen?0:interval)).toISOString(),reason:out.reason,r:net/position.riskUnit});
     position=null;
   }

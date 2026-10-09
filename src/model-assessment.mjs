@@ -14,9 +14,9 @@ export function assessModel(model){
 export function applyModelAssessment(decision,model){
   const modelAssessment=assessModel(model);
   if(modelAssessment.passed)return {...decision,modelAssessment};
-  // Keep an existing actionable block visible; model evidence remains separately
-  // available in modelAssessment and the confidence explanation.
-  const reason=decision.side==='HOLD'&&decision.reason?decision.reason:modelAssessment.reason;
+  // Preserve independent execution/H1 blocks. A rejected probability must not
+  // survive as the main reason once its model evidence is unavailable.
+  const reason=decision.side==='HOLD'&&decision.reason&&!decision.filteredByConfidence?decision.reason:modelAssessment.reason;
   return {...decision,side:'HOLD',reason,entry:null,stop:null,target:null,
     setup:decision.setup?{...decision.setup,confirmed:false,entry:null,stop:null,target:null}:undefined,
     confidence:{...decision.confidence,percent:null,classProbs:null,status:'unvalidated',

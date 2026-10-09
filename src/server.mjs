@@ -13,7 +13,7 @@ import {decide,featureWindow,signalPolicy} from './decision.mjs';
 import {DerivLiveFeed,DERIV_SOURCE,DERIV_SYMBOLS} from './deriv-feed.mjs';
 import {buildIdeaSetups,rankIdeas,explainHold} from './ideas.mjs';
 import {NewsService} from './news.mjs';
-import {costForSymbol} from './cost-policy.mjs';
+import {costForSymbol,roundTripFee} from './cost-policy.mjs';
 import {strategyEvidence} from './strategy-evidence.mjs';
 import {SignalFollowup} from './signal-followup.mjs';
 import {marketHealth} from './market-health.mjs';
@@ -134,8 +134,8 @@ export function createApp({port=4328,dbPath=path.join(root,'runtime','funded.sql
     for(const symbol of marketSymbols){const d=datasets.get(symbol);if(d)signalFollowup.observe({symbol,source:d.source,quote:d.quote,fresh:exitFresh(d)});}
   }
   function signalHistory(symbol){const items=db.prepare("SELECT id,time,payload FROM events WHERE json_extract(payload,'$.type')='signal' ORDER BY time DESC LIMIT 100").all().map(row=>({id:row.id,time:row.time,...JSON.parse(row.payload)})).filter(item=>!symbol||item.symbol===symbol);return {mode:'observed-live',monitoringSince,items};}
-  function finish(p,price,reason){const dir=p.side==='BUY'?1:-1,exit=price*(1-dir*p.slippageBps/10000),pnl=dir*(exit-p.entry)*p.quantity-(exit+p.entry)*p.quantity*p.feeBps/10000;savePosition({...p,status:'closed',exit,pnl,closedAt:new Date().toISOString(),reason});event({type:'close',symbol:p.symbol,pnl,reason});}
-  function account(){const pr=profile(),ps=positions(),closed=ps.filter(x=>x.status==='closed'),realized=closed.reduce((s,p)=>s+p.pnl,0),floating=ps.filter(x=>x.status==='open').reduce((s,p)=>{const d=datasets.get(p.symbol),px=d?.quote?.price??p.entry,dir=p.side==='BUY'?1:-1;return s+dir*(px-p.entry)*p.quantity-(px+p.entry)*p.quantity*p.feeBps/10000;},0),equity=pr.capital+realized+floating,day=new Intl.DateTimeFormat('en-CA',{timeZone:pr.resetTimezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());db.prepare('INSERT OR IGNORE INTO day_equity VALUES (?,?)').run(day,equity);const dayStart=db.prepare('SELECT equity FROM day_equity WHERE day=?').get(day).equity;
+  function finish(p,price,reason){const dir=p.side==='BUY'?1:-1,exit=price*(1-dir*p.slippageBps/10000),pnl=dir*(exit-p.entry)*p.quantity-roundTripFee({feeBps:p.feeBps,feePerUnit:p.cost?.feePerUnit??0},p.entry,exit)*p.quantity;savePosition({...p,status:'closed',exit,pnl,closedAt:new Date().toISOString(),reason});event({type:'close',symbol:p.symbol,pnl,reason});}
+  function account(){const pr=profile(),ps=positions(),closed=ps.filter(x=>x.status==='closed'),realized=closed.reduce((s,p)=>s+p.pnl,0),floating=ps.filter(x=>x.status==='open').reduce((s,p)=>{const d=datasets.get(p.symbol),px=d?.quote?.price??p.entry,dir=p.side==='BUY'?1:-1;return s+dir*(px-p.entry)*p.quantity-roundTripFee({feeBps:p.feeBps,feePerUnit:p.cost?.feePerUnit??0},p.entry,px)*p.quantity;},0),equity=pr.capital+realized+floating,day=new Intl.DateTimeFormat('en-CA',{timeZone:pr.resetTimezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());db.prepare('INSERT OR IGNORE INTO day_equity VALUES (?,?)').run(day,equity);const dayStart=db.prepare('SELECT equity FROM day_equity WHERE day=?').get(day).equity;
     return {capital:pr.capital,equity,realized,floating,dayStart,dayLoss:Math.max(0,dayStart-equity),totalLoss:Math.max(0,pr.capital-equity),target:pr.capital*pr.targetPercent/100,remaining:Math.max(0,pr.capital*(1+pr.targetPercent/100)-equity),tradingDays:new Set(ps.map(p=>new Intl.DateTimeFormat('en-CA',{timeZone:pr.resetTimezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(p.openedAt)))).size,openRisk:ps.filter(p=>p.status==='open').reduce((s,p)=>s+p.risk,0),stalePositions:ps.filter(p=>p.status==='open'&&!fresh(datasets.get(p.symbol))).length};
   }
   function replaySnapshot(symbol,full=false){

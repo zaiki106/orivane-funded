@@ -1,4 +1,5 @@
 import {metrics} from './engine.mjs';
+import {validTradingCost} from './cost-policy.mjs';
 
 const minimumSample=20;
 const sameNumber=(left,right)=>Number.isFinite(left)&&Number.isFinite(right)&&Math.abs(left-right)<=1e-9*Math.max(1,Math.abs(left),Math.abs(right));
@@ -21,7 +22,7 @@ export function strategyEvidence(lab,strategyId){
   if(matches.length!==1)return unavailable(strategyId,matches.length?'duplicate-strategy':'unknown-strategy');
   const result=matches[0],name=typeof result.name==='string'&&result.name.trim()?result.name:null,cost=result.cost;
   if(!name)return unavailable(strategyId,'invalid-strategy');
-  if(!cost||!Number.isFinite(cost.feeBps)||cost.feeBps<0||!Number.isFinite(cost.slippageBps)||cost.slippageBps<0||typeof cost.assumption!=='boolean')return unavailable(strategyId,'invalid-cost-assumptions',name);
+  if(!validTradingCost(cost)||typeof cost.assumption!=='boolean')return unavailable(strategyId,'invalid-cost-assumptions',name);
   const sample=result.test;
   if(!sample||!Number.isSafeInteger(sample.n)||sample.n<0||!Number.isSafeInteger(sample.wins)||sample.wins<0||sample.wins>sample.n||!Array.isArray(sample.trades)||sample.trades.length!==sample.n)return unavailable(strategyId,'invalid-test-metrics',name);
   let previousEntry=-Infinity,firstEntry=Infinity,lastExit=-Infinity;
@@ -39,6 +40,6 @@ export function strategyEvidence(lab,strategyId){
   if(expectedInterval===null?interval!==null:!Array.isArray(interval)||interval.length!==2||!interval.every((value,i)=>sameNumber(value,expectedInterval[i])))return unavailable(strategyId,'invalid-test-metrics',name);
   return {strategy:strategyId,name,partition:'test',coverage:'closed-test-trades',minimumSample,status:sample.n>=minimumSample?'available':'insufficient',
     sample:sample.n,wins:sample.wins,winRate:sample.winRate,winInterval:interval===null?null:[...interval],expectancy:sample.expectancy,totalR:sample.totalR,profitFactor:sample.profitFactor,maxDrawdownR:sample.maxDrawdownR,
-    cost:{feeBps:cost.feeBps,slippageBps:cost.slippageBps,assumption:cost.assumption},
+    cost:{...cost},
     tradeFrom:sample.n?new Date(firstEntry).toISOString():null,tradeTo:sample.n?new Date(lastExit).toISOString():null};
 }

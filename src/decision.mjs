@@ -3,14 +3,14 @@ import {fitRegularizedLDA,predictRegularizedLDA,validLinearDiscriminant,ldaAlgor
 import {pricePatternChecks} from './price-patterns.mjs';
 import {executionPlan} from './execution-plan.mjs';
 import {indicators,signal,analysisWindow} from './engine.mjs';
-import {costForSymbol} from './cost-policy.mjs';
+import {costForSymbol,directionalCostFraction,validTradingCost} from './cost-policy.mjs';
 import {fitNearestNeighbors,predictNearestNeighbors,validNeighborModel,neighborAlgorithm} from './nearest-neighbors.mjs';
 import {fitRegularizedQDA,predictRegularizedQDA,validDiscriminantModel,qdaAlgorithm} from './regularized-qda.mjs';
 import {fitNeuralNetwork,predictNeuralNetwork,validNeuralModel,neuralAlgorithm} from './neural-network.mjs';
 
 export const classes=['UP','DOWN','FLAT'];
 export const featureNames=['return1Atr','return4Atr','return12Atr','emaFastAtr','emaSlowAtr','rsiCentered','macdHistogramAtr','atrFraction','bandPosition','logVolumeRatio','volumeAvailable','h1Direction','h1Available'];
-export const decisionVersion='regime-classifier-v5';
+export const decisionVersion='regime-classifier-v6';
 export const featureWindow=analysisWindow;
 export const signalPolicy=Object.freeze({id:'confidence-above-60-v1',minimumPercent:60,comparison:'>'});
 const version=decisionVersion;
@@ -122,13 +122,13 @@ function labelFrom(bars,index,atr,{horizonBars,neutralAtr,cost,timeframe}){
   if(index+horizonBars>=bars.length)return null;
   const interval=timeframe*60000;
   for(let i=index+1;i<=index+horizonBars;i++)if(Date.parse(bars[i].time)-Date.parse(bars[i-1].time)!==interval)return null;
-  const grossReturn=bars[index+horizonBars].close/bars[index].close-1,roundTripCost=2*(cost.feeBps+cost.slippageBps)/10000,neutralBand=neutralAtr*atr/bars[index].close+roundTripCost;
+  const grossReturn=bars[index+horizonBars].close/bars[index].close-1,roundTripCost=directionalCostFraction(cost,bars[index].close),neutralBand=neutralAtr*atr/bars[index].close+roundTripCost;
   return {label:grossReturn>neutralBand?'UP':grossReturn< -neutralBand?'DOWN':'FLAT',grossReturn,neutralBand,roundTripCost,labelEndIndex:index+horizonBars,labelEndTime:new Date(Date.parse(bars[index+horizonBars].time)+interval).toISOString()};
 }
 
 function configuration(dataset={},options={}){
   const config={horizonBars:4,timeframe:dataset.timeframe??15,neutralAtr:.35,maxHistory:2000,minTrainSamples:120,minCalibrationSamples:50,minClassSamples:5,minCalibrationClassSamples:3,minTestSamples:40,iterations:400,regularization:.01,...options,cost:{...costForSymbol(dataset.symbol),...options.cost}};
-  if(config.timeframe!==15||!Number.isInteger(config.horizonBars)||config.horizonBars<1||config.horizonBars>32||!Number.isInteger(config.maxHistory)||config.maxHistory<200||config.maxHistory>10000||!Number.isFinite(config.neutralAtr)||config.neutralAtr<0||![config.cost.feeBps,config.cost.slippageBps].every(x=>Number.isFinite(x)&&x>=0&&x<=1000))throw Error('Configuration du modèle invalide');
+  if(config.timeframe!==15||!Number.isInteger(config.horizonBars)||config.horizonBars<1||config.horizonBars>32||!Number.isInteger(config.maxHistory)||config.maxHistory<200||config.maxHistory>10000||!Number.isFinite(config.neutralAtr)||config.neutralAtr<0||!validTradingCost(config.cost))throw Error('Configuration du modèle invalide');
   for(const key of ['minTrainSamples','minCalibrationSamples','minClassSamples','minCalibrationClassSamples','minTestSamples','iterations'])if(!Number.isInteger(config[key])||config[key]<1||config[key]>10000)throw Error('Configuration du modèle invalide');
   if(!Number.isFinite(config.regularization)||config.regularization<0||config.regularization>10)throw Error('Configuration du modèle invalide');
   return config;

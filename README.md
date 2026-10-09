@@ -126,3 +126,11 @@ Le volet repliable « Contrôles du signal » montre sept contrôles indépendan
 Les backtests de règles excluent désormais les bougies en formation. Si une position traverse un trou de données, son issue est censurée et exclue des statistiques plutôt que d'être déduite d'une bougie ultérieure. La propriété `censored` compte ces positions. Les clôtures de fin de période restent des sorties simulées au cours de clôture.
 
 Le fichier `../audit-strategies-40.json` présente les quatre dernières règles sur le dernier quart des historiques fournisseurs disponibles, avec coûts de base et coûts doublés. Il teste les règles seules, sans les filtres H1 et probabilité du moteur complet ; le replay du terminal reste le rapport distinct de ce moteur. Aucun résultat n'est une observation de trade réel.
+
+## Profil The5ers
+
+Activer avec ORIVANE_COST_PROFILE=the5ers. La [commission publiée](https://the5ers.com/faqs/what-are-the-spreads-and-commissions/) est de 4 USD par lot forex aller-retour pour un contrat de 100 000 unités. Le moteur utilise donc 0,00002 USD par unité et par côté, converti en fraction du prix seulement pour les étiquettes directionnelles. Cette commission reste fixe en dollars dans le calcul du risque, les backtests, le replay, les positions paper et le journal. Les indices ont une commission publiée nulle.
+
+Le glissement reste hypothétique à 2 pb par côté pour FX/NDX ; le spread historique The5ers manque. Les taux crypto et métaux ne sont pas chiffrés dans cette FAQ : leurs hypothèses antérieures sont conservées avec commissionVerified=false. Aucune source de cotation The5ers n’est connectée : Kraken, Deriv et Yahoo restent distincts. Le Nasdaq Yahoo est un indice et ne représente pas le CFD du compte.
+
+Le contrôle du modèle refuse toujours les estimations qui ne battent pas leur référence sur le test. Sa raison remplace désormais tout pourcentage rejeté, tout en conservant les blocages indépendants H1/prix. Le seuil BUY/SELL reste strictement supérieur à 60 %.

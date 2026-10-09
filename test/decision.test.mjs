@@ -163,7 +163,7 @@ test('model reports all class samples, frozen holdout scoring and finite probabi
 });
 
 test('one classifier is selected by calibration Brier among five families and eleven independent variants',()=>{
-  assert.equal(decisionVersion,'regime-classifier-v5');
+  assert.equal(decisionVersion,'regime-classifier-v6');
   assert.ok(['multinomial-logistic','weighted-knn','regularized-qda','neural-network','regularized-lda'].includes(model.algorithm));
   assert.equal(model.selection.metric,'brier');assert.equal(model.selection.partition,'calibration');
   assert.equal(model.selection.holdoutUsed,false);assert.equal(model.selection.trainingRefit,false);

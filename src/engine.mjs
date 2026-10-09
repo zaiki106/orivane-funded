@@ -1,6 +1,6 @@
 import {pricePatternContext,pricePatternChecks} from './price-patterns.mjs';
 import {executionPlan} from './execution-plan.mjs';
-import {costForSymbol} from './cost-policy.mjs';
+import {costForSymbol,roundTripFee} from './cost-policy.mjs';
 
 export const analysisWindow=160;
 export const strategies = [
@@ -532,19 +532,19 @@ export function metrics(trades){
   const phat=n?w/n:0,z=1.96,den=1+z*z/Math.max(n,1),center=(phat+z*z/(2*Math.max(n,1)))/den,half=z*Math.sqrt(phat*(1-phat)/Math.max(n,1)+z*z/(4*Math.max(n,1)**2))/den;
   return {n,wins:w,winRate:n?100*w/n:null,winInterval:n?[Math.max(0,center-half)*100,Math.min(1,center+half)*100]:null,expectancy:n?equity/n:null,totalR:equity,profitFactor:negative?positive/negative:null,maxDrawdownR:dd};
 }
-export function backtest(bars,strategy,{start=60,end=bars.length,feeBps=2,slippageBps=2,maxBars=16}={}){
+export function backtest(bars,strategy,{start=60,end=bars.length,feeBps=2,feePerUnit=0,slippageBps=2,maxBars=16}={}){
   bars=bars.filter(bar=>bar.closed!==false);end=Math.min(end,bars.length);
   const trades=[];let p=null,censored=0;
   for(let i=Math.max(60,start);i<end;i++){
     const b=bars[i];
     if(Date.parse(b.time)-Date.parse(bars[i-1].time)!==900000){if(p){censored++;p=null;}continue;}
-    if(p){let out=Date.parse(b.time)-Date.parse(p.time)>=maxBars*900000?{price:b.open,reason:'Expiration '+maxBars+' × 15 min'}:exitPrice(p,b);if(!out&&i===end-1)out={price:b.close,reason:'Fin de période'};if(out){const dir=p.side==='BUY'?1:-1,price=out.price*(1-dir*slippageBps/10000),net=dir*(price-p.entry)-(p.entry+price)*feeBps/10000;trades.push({...p,exit:price,exitTime:b.time,reason:out.reason,r:net/p.riskUnit});p=null;}continue;}
+    if(p){let out=Date.parse(b.time)-Date.parse(p.time)>=maxBars*900000?{price:b.open,reason:'Expiration '+maxBars+' × 15 min'}:exitPrice(p,b);if(!out&&i===end-1)out={price:b.close,reason:'Fin de période'};if(out){const dir=p.side==='BUY'?1:-1,price=out.price*(1-dir*slippageBps/10000),net=dir*(price-p.entry)-roundTripFee({feeBps,feePerUnit},p.entry,price);trades.push({...p,exit:price,exitTime:b.time,reason:out.reason,r:net/p.riskUnit});p=null;}continue;}
     if(i===end-1||Date.parse(b.time)-Date.parse(bars[i-1].time)>30*60000)continue;
     const s=signal(bars.slice(Math.max(0,i-analysisWindow),i),strategy);if(s.side==='HOLD')continue;
-    const plan=executionPlan(s,{price:b.open},{feeBps,slippageBps});if(!plan.valid)continue;
+    const plan=executionPlan(s,{price:b.open},{feeBps,feePerUnit,slippageBps});if(!plan.valid)continue;
     const {entry,stop,target}=plan,dir=s.side==='BUY'?1:-1,distance=plan.riskDistance;
     p={side:s.side,entry,stop,target,distance,riskUnit:plan.netRisk,index:i,time:b.time,signalTime:s.time,strategy};
-    const out=exitPrice(p,b);if(out){const price=out.price*(1-dir*slippageBps/10000);trades.push({...p,exit:price,exitTime:b.time,reason:out.reason,r:(dir*(price-entry)-(entry+price)*feeBps/10000)/p.riskUnit});p=null;}
+    const out=exitPrice(p,b);if(out){const price=out.price*(1-dir*slippageBps/10000);trades.push({...p,exit:price,exitTime:b.time,reason:out.reason,r:(dir*(price-entry)-roundTripFee({feeBps,feePerUnit},entry,price))/p.riskUnit});p=null;}
   }
   return {...metrics(trades),trades,censored};
 }

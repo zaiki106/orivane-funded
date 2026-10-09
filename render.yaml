@@ -8,6 +8,8 @@ services:
     startCommand: node src/cloud-server.mjs
     healthCheckPath: /healthz
     envVars:
+      - key: ORIVANE_COST_PROFILE
+        value: the5ers
       - key: NODE_VERSION
         value: 24
       - key: ORIVANE_ACCESS_PASSWORD

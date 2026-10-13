@@ -1,0 +1,5 @@
+{
+  "repository": "https://github.com/bukosabino/ta",
+  "sha": "a890410710a6e483c9ba08da7f3dd5089e4b9dff",
+  "purpose": "Pinned upstream sources for independent indicator verification; Python is not loaded by the live browser"
+}

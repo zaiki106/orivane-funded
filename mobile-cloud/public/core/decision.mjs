@@ -6,7 +6,7 @@ import {auditProbabilityRows} from './probability-audit.mjs';
 import {fitRegularizedLDA,predictRegularizedLDA,validLinearDiscriminant,ldaAlgorithm} from './regularized-lda.mjs';
 import {pricePatternChecks} from './price-patterns.mjs';
 import {executionPlan} from './execution-plan.mjs';
-import {indicators,signal,analysisWindow} from './engine.mjs';
+import {indicators,signal,strategies,analysisWindow} from './engine.mjs';
 import {costForSymbol,directionalCostFraction,validTradingCost} from './cost-policy.mjs';
 import {fitNearestNeighbors,predictNearestNeighbors,validNeighborModel,neighborAlgorithm} from './nearest-neighbors.mjs';
 import {fitRegularizedQDA,predictRegularizedQDA,validDiscriminantModel,qdaAlgorithm} from './regularized-qda.mjs';
@@ -113,7 +113,16 @@ function routeFrom(q,h1,router){
 export function routeStrategy(bars,router=defaultRouter){
   const b=closed(bars),asOf=Date.parse(b.at(-1)?.time)+900000;
   const fitted=router?.fittedThrough&&Date.parse(router.fittedThrough)>asOf?defaultRouter:{...defaultRouter,...router};
-  return routeFrom(indicators(b.slice(-featureWindow)),higherTimeframe(b),fitted);
+  const q=indicators(b.slice(-featureWindow)),route=routeFrom(q,higherTimeframe(b),fitted);
+  if(!q||signal([],route.strategy,q).side!=='HOLD')return route;
+  // The regime preference must not mask a completed technical rule. Keep a fixed
+  // catalog precedence and select exactly one rule; probabilities never rank rules.
+  for(const rule of strategies){
+    if(rule.id===route.strategy)continue;
+    if(signal([],rule.id,q).side!=='HOLD')return {...route,strategy:rule.id,regime:'Completed structure',setupPresent:true,
+      why:rule.description,preferredStrategy:route.strategy,policy:'regime-structure-v6'};
+  }
+  return route;
 }
 
 function featurePoint(bars,index){

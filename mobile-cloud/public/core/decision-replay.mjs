@@ -1,13 +1,14 @@
 import {decide} from './decision.mjs';
 import {exitPrice,metrics} from './engine.mjs';
-import {costForSymbol,roundTripFee} from './cost-policy.mjs';
+import {costForSymbol,roundTripFee,validTradingCost} from './cost-policy.mjs';
 
 // Frozen model, chronological held-out candles, one position at a time.
 // The end-of-test model assessment is deliberately NOT fed back into past decisions.
 export function replayDecisions(dataset,model,{costMultiplier=1}={}){
   if(!Number.isFinite(costMultiplier)||costMultiplier<1||costMultiplier>4)throw Error('Scénario de coûts invalide');
   const bars=(dataset.bars??[]).filter(b=>b.closed!==false),interval=900000;
-  const baseCost=costForSymbol(dataset.symbol),cost={...baseCost,feeBps:baseCost.feeBps*costMultiplier,slippageBps:baseCost.slippageBps*costMultiplier,...(baseCost.feePerUnit!==undefined?{feePerUnit:baseCost.feePerUnit*costMultiplier}:{})};
+  if(model?.cost!=null&&!validTradingCost(model.cost))throw Error('Coûts du modèle invalides');
+  const baseCost=model?.cost??costForSymbol(dataset.symbol),cost={...baseCost,feeBps:baseCost.feeBps*costMultiplier,slippageBps:baseCost.slippageBps*costMultiplier,...(baseCost.feePerUnit!==undefined?{feePerUnit:baseCost.feePerUnit*costMultiplier}:{})};
   const base={kind:'frozen-model-replay',symbol:dataset.symbol,source:dataset.source,
     from:bars[0]?.time??null,to:bars.at(-1)?.time??null,bars:bars.length,
     cost,costMultiplier,horizonBars:model?.event?.horizonBars??4,

@@ -72,7 +72,7 @@ export class DerivLiveFeed{
         m.verified=!!entry&&entry.market===spec.market&&entry.submarket===spec.submarket&&(entry.underlying_symbol_type??entry.market)===spec.market;
         m.marketOpen=entry?Boolean(entry.exchange_is_open)&&!entry.is_trading_suspended:null;
         if(!m.verified){this.error='Classification Deriv non vérifiée : '+symbol;continue;}
-        this.send({ticks_history:spec.id,style:'candles',granularity:this.interval*60,count:1000,end:'latest',subscribe:1});
+        this.send({ticks_history:spec.id,style:'candles',granularity:this.interval*60,count:5000,end:'latest',subscribe:1});
         this.send({ticks:spec.id,subscribe:1});
       }
       return true;

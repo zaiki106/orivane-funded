@@ -12,8 +12,12 @@ test('each walk-forward selection depends only on its chronological training pre
  const changed=bars.map((b,i)=>i<130?b:{...b,open:b.open*1.2,high:b.high*1.2,low:b.low*1.2,close:b.close*1.2});
  const after=walkForwardResearch({symbol:'TEST',bars:changed});
  assert.equal(before.folds[0].selected,after.folds[0].selected);assert.deepEqual(before.folds[0].train,after.folds[0].train);
+ assert.deepEqual(before.folds[0].comparison.contenders.map(c=>({id:c.id,train:c.train})),after.folds[0].comparison.contenders.map(c=>({id:c.id,train:c.train})));
  for(const f of before.folds){assert.ok(Date.parse(f.trainThrough)<Date.parse(f.testFrom));if(f.test)for(const t of f.test.trades)assert.ok(Date.parse(t.time)>=Date.parse(f.testFrom));}
  assert.equal(before.confidenceUnchanged,true);
  assert.equal(before.costStress.selectionFrozen,true);assert.equal(before.costStress.partition,'next-fold');
  assert.deepEqual(before.costStress.scenarios.map(s=>s.multiplier),[1,2,3]);assert.deepEqual(before.costStress.scenarios[0].metrics,before.metrics);
+ assert.equal(before.comparison.strategies,66);assert.equal(before.comparison.diagnosticOnly,true);
+ for(const f of before.folds){assert.equal(f.comparison.evaluated,66);assert.ok(f.comparison.contenders.length<=5);assert.equal(f.comparison.ranking,'train-only-net-expectancy');}
+ assert.equal(before.pathRisk.forecast,false);assert.equal(before.pathRisk.sample,before.metrics.n);
 });

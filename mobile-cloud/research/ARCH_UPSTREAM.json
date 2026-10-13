@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/bashtage/arch",
+  "sha": "72bb33821b7c45f431defab3043aca424d89a58c",
+  "source": "arch/bootstrap/_samplers_python.py",
+  "license": "Kevin Sheppard permissive license; full conditions retained in ARCH_LICENSE.md",
+  "purpose": "Stationary index sampler adapted into JavaScript; no Python dependency in production"
+}

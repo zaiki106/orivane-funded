@@ -21,7 +21,7 @@ test('the public AI contract names the selected trained classifier and exposes c
     assert.equal(publicModel.calibrated,trained.algorithm!=='weighted-knn');
     for(const key of ['weights','scaler','neighbors','neural','discriminant','samples','features','covariance','cholesky'])assert.ok(!(key in publicModel));
     assert.equal(market.decision.confidence.algorithm,trained.algorithm);
-    assert.equal(state.strategyCatalog.length,42);assert.ok(state.strategyCatalog.some(s=>s.id==='ichimoku'));
+    assert.equal(state.strategyCatalog.length,54);assert.ok(state.strategyCatalog.some(s=>s.id==='ichimoku'));
     assert.ok(market.decision.confidence.neighboursDetail.every(n=>!('features'in n)&&Date.parse(n.labelEndTime)<=Date.parse(trained.trainedThrough)));
   }finally{await app.close();}
 });

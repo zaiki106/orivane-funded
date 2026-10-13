@@ -1,9 +1,11 @@
+import {advancedStrategies,advancedContext,advancedChecks} from './advanced-strategies.mjs';
 import {pricePatternContext,pricePatternChecks} from './price-patterns.mjs';
 import {executionPlan} from './execution-plan.mjs';
 import {costForSymbol,roundTripFee} from './cost-policy.mjs';
 
 export const analysisWindow=160;
 export const strategies = [
+  ...advancedStrategies,
   {id:'breakout-retest',name:'Donchian breakout retest',description:'Cassure clôturée du canal 20 antérieur, retest maintenu puis nouvelle clôture de confirmation ; EMA 21/50 alignées et corps ≥ 0,25 ATR.'},
   {id:'two-bar-pullback',name:'Two-bar pullback reclaim',description:'Deux corps de repli opposés à la tendance EMA 21/50, toucher EMA 21 puis rupture des deux extrêmes en clôture ; trois bougies consécutives et corps ≥ 0,25 ATR.'},
   {id:'fractal-breakout',name:'Confirmed fractal breakout',description:'Pivot strict sur 5 bougies terminé avant le signal, confirmé par deux bougies à droite ; premier franchissement en clôture, EMA 21/50 et corps ≥ 0,25 ATR.'},
@@ -180,7 +182,7 @@ export function indicators(bars,{includeForming=false}={}){
   const e9=ema9.at(-1),e21=ema21.at(-1),e50=ema50.at(-1),atr=atrSeries.at(-1),volumeMean=avg(b.slice(-21,-1).map(x=>x.volume));
   const st=supertrendSeries(b,wilderSeries(range,10)),stoch=Array.from({length:4},(_,i)=>fastStochastic(b,b.length-4+i)),mother=b.at(-3),inside=previous.high<mother.high&&previous.low>mother.low,contiguous=Date.parse(last.time)-Date.parse(previous.time)===900000&&Date.parse(previous.time)-Date.parse(mother.time)===900000;
   const ar=aroon(b,b.length-1),previousAr=aroon(b,b.length-2),expanded={...directionalMovement(b,range),...ichimoku(b),...furtherIndicators(b,range,ema21),...nextIndicators(b,ema12,ema26,gains,losses),cci:cci(b,b.length-1),previousCci:cci(b,b.length-2),aroonUp:ar.up,aroonDown:ar.down,previousAroonUp:previousAr.up,previousAroonDown:previousAr.down,donchian55High:Math.max(...b.slice(-56,-1).map(bar=>bar.high)),donchian55Low:Math.min(...b.slice(-56,-1).map(bar=>bar.low)),roc:100*(last.close/c.at(-13)-1),previousRoc:100*(previous.close/c.at(-14)-1),rocBase:c.at(-13)};
-  return {...pricePatternContext(b),last,previous,mother,e9,e20:ema20.at(-1),e21,e50,e12:ema12.at(-1),e26:ema26.at(-1),atr,previousAtr:atrSeries.at(-2),...currentBand,previousBand,...expanded,rsi:rs(gains.at(-1),losses.at(-1)),previousRsi:rs(gains.at(-2),losses.at(-2)),gain:gains.at(-1),loss:losses.at(-1),previousGain:gains.at(-2),previousLoss:losses.at(-2),previousE9:ema9.at(-2),previousE20:ema20.at(-2),previousE21:ema21.at(-2),previousE50:ema50.at(-2),previousE12:ema12.at(-2),previousE26:ema26.at(-2),macd:macd.at(-1),macdSignal:macdSignal.at(-1),previousMacd:macd.at(-2),previousMacdSignal:macdSignal.at(-2),squeezeThreshold:widths[Math.floor((widths.length-1)*.2)],vwap:rollingVwap(b.slice(-20)),previousVwap:rollingVwap(b.slice(-21,-1)),trend:Math.abs(e21-e50)/Math.max(atr,1e-9),high:Math.max(...b.slice(-21,-1).map(x=>x.high)),low:Math.min(...b.slice(-21,-1).map(x=>x.low)),volumeRatio:volumeMean>0?last.volume/volumeMean:null,hasVolume:b.slice(-21).every(x=>x.volume>0),supertrend:st.at(-1).line,supertrendDirection:st.at(-1).direction,previousSupertrendDirection:st.at(-2).direction,stochastic:stoch.at(-1),stochasticD:avg(stoch.slice(-3)),previousStochastic:stoch.at(-2),previousStochasticD:avg(stoch.slice(0,3)),insideBar:inside,patternContiguous:contiguous,keltnerUpper:ema20.at(-1)+2*atr,keltnerLower:ema20.at(-1)-2*atr,previousKeltnerUpper:ema20.at(-2)+2*atrSeries.at(-2),previousKeltnerLower:ema20.at(-2)-2*atrSeries.at(-2),recentLow:Math.min(...b.slice(-3).map(x=>x.low)),recentHigh:Math.max(...b.slice(-3).map(x=>x.high))};
+  return {advanced:advancedContext(b),...pricePatternContext(b),last,previous,mother,e9,e20:ema20.at(-1),e21,e50,e12:ema12.at(-1),e26:ema26.at(-1),atr,previousAtr:atrSeries.at(-2),...currentBand,previousBand,...expanded,rsi:rs(gains.at(-1),losses.at(-1)),previousRsi:rs(gains.at(-2),losses.at(-2)),gain:gains.at(-1),loss:losses.at(-1),previousGain:gains.at(-2),previousLoss:losses.at(-2),previousE9:ema9.at(-2),previousE20:ema20.at(-2),previousE21:ema21.at(-2),previousE50:ema50.at(-2),previousE12:ema12.at(-2),previousE26:ema26.at(-2),macd:macd.at(-1),macdSignal:macdSignal.at(-1),previousMacd:macd.at(-2),previousMacdSignal:macdSignal.at(-2),squeezeThreshold:widths[Math.floor((widths.length-1)*.2)],vwap:rollingVwap(b.slice(-20)),previousVwap:rollingVwap(b.slice(-21,-1)),trend:Math.abs(e21-e50)/Math.max(atr,1e-9),high:Math.max(...b.slice(-21,-1).map(x=>x.high)),low:Math.min(...b.slice(-21,-1).map(x=>x.low)),volumeRatio:volumeMean>0?last.volume/volumeMean:null,hasVolume:b.slice(-21).every(x=>x.volume>0),supertrend:st.at(-1).line,supertrendDirection:st.at(-1).direction,previousSupertrendDirection:st.at(-2).direction,stochastic:stoch.at(-1),stochasticD:avg(stoch.slice(-3)),previousStochastic:stoch.at(-2),previousStochasticD:avg(stoch.slice(0,3)),insideBar:inside,patternContiguous:contiguous,keltnerUpper:ema20.at(-1)+2*atr,keltnerLower:ema20.at(-1)-2*atr,previousKeltnerUpper:ema20.at(-2)+2*atrSeries.at(-2),previousKeltnerLower:ema20.at(-2)-2*atrSeries.at(-2),recentLow:Math.min(...b.slice(-3).map(x=>x.low)),recentHigh:Math.max(...b.slice(-3).map(x=>x.high))};
 }
 export function signal(bars,strategy,context=null){
   const definition=strategies.find(s=>s.id===strategy);if(!definition)throw Error('Stratégie inconnue');
@@ -191,7 +193,7 @@ export function signal(bars,strategy,context=null){
   const check=(label,passed,value)=>({label,passed:Boolean(passed),...(value===undefined?{}:{value:typeof value==='number'?rounded(value):value})});
   let buy=[],sell=[],triggerBuy=p.high,triggerSell=p.low,triggerSummary='Rupture de la bougie précédente';
   const volumeCheck=q.hasVolume?[check('Volume ≥ 1,2 × moyenne 20',q.volumeRatio>=1.2,q.volumeRatio)]:[];
-  if(['nr7-breakout','engulfing-reclaim','fractal-breakout','failed-breakout','two-bar-pullback','breakout-retest'].includes(strategy)){
+  if(advancedStrategies.some(s=>s.id===strategy)){({BUY:buy,SELL:sell}=advancedChecks(q,strategy));triggerSummary=definition.description;}else if(['nr7-breakout','engulfing-reclaim','fractal-breakout','failed-breakout','two-bar-pullback','breakout-retest'].includes(strategy)){
     ({BUY:buy,SELL:sell}=pricePatternChecks(q,strategy));
     triggerSummary=strategy==='breakout-retest'?'Cassure du canal 20 passé · retest tenu · clôture de confirmation':strategy==='two-bar-pullback'?'Deux replis · reprise EMA 21 · rupture des deux extrêmes':strategy==='fractal-breakout'?'Pivot strict déjà confirmé · nouveau franchissement · EMA 21/50':strategy==='failed-breakout'?'Clôture hors canal passé · réintégration directionnelle':strategy==='nr7-breakout'?'NR7 strict · cassure en clôture · tendance EMA 21/50':'Corps opposé englouti · reprise EMA 21 · tendance EMA 21/50';
   }else if(strategy==='pullback'){
@@ -385,7 +387,7 @@ export function setupTriggers(bars,strategy,context=null){
   if(!q)return {BUY:item(null,'unavailable','Historique insuffisant'),SELL:item(null,'unavailable','Historique insuffisant')};
   const x=q.last,currentHigh=Math.max(...history.slice(-20).map(b=>b.high)),currentLow=Math.min(...history.slice(-20).map(b=>b.low));
   let buy=item(x.high,'close_above','Prochaine clôture au-dessus du sommet courant ; autres critères de la règle requis'),sell=item(x.low,'close_below','Prochaine clôture sous le creux courant ; autres critères de la règle requis');
-  if(strategy==='breakout'){
+  if(advancedStrategies.some(s=>s.id===strategy)){buy=item(null,'indicator',strategies.find(s=>s.id===strategy).description,x.close);sell=item(null,'indicator',strategies.find(s=>s.id===strategy).description,x.close);}else if(strategy==='breakout'){
     buy=item(currentHigh,'close_above','Clôture hors du canal 20 terminé, expansion et volume si disponible');sell=item(currentLow,'close_below','Clôture hors du canal 20 terminé, expansion et volume si disponible');
   }else if(strategy==='ema-cross'){
     const level=((1-2/22)*q.e21-(1-2/10)*q.e9)/(2/10-2/22);
@@ -532,7 +534,7 @@ export function metrics(trades){
   const phat=n?w/n:0,z=1.96,den=1+z*z/Math.max(n,1),center=(phat+z*z/(2*Math.max(n,1)))/den,half=z*Math.sqrt(phat*(1-phat)/Math.max(n,1)+z*z/(4*Math.max(n,1)**2))/den;
   return {n,wins:w,winRate:n?100*w/n:null,winInterval:n?[Math.max(0,center-half)*100,Math.min(1,center+half)*100]:null,expectancy:n?equity/n:null,totalR:equity,profitFactor:negative?positive/negative:null,maxDrawdownR:dd};
 }
-export function backtest(bars,strategy,{start=60,end=bars.length,feeBps=2,feePerUnit=0,slippageBps=2,maxBars=16}={}){
+export function backtest(bars,strategy,{start=60,end=bars.length,feeBps=2,feePerUnit=0,slippageBps=2,maxBars=16,contextCache=null}={}){
   bars=bars.filter(bar=>bar.closed!==false);end=Math.min(end,bars.length);
   const trades=[];let p=null,censored=0;
   for(let i=Math.max(60,start);i<end;i++){
@@ -540,7 +542,7 @@ export function backtest(bars,strategy,{start=60,end=bars.length,feeBps=2,feePer
     if(Date.parse(b.time)-Date.parse(bars[i-1].time)!==900000){if(p){censored++;p=null;}continue;}
     if(p){let out=Date.parse(b.time)-Date.parse(p.time)>=maxBars*900000?{price:b.open,reason:'Expiration '+maxBars+' × 15 min'}:exitPrice(p,b);if(!out&&i===end-1)out={price:b.close,reason:'Fin de période'};if(out){const dir=p.side==='BUY'?1:-1,price=out.price*(1-dir*slippageBps/10000),net=dir*(price-p.entry)-roundTripFee({feeBps,feePerUnit},p.entry,price);trades.push({...p,exit:price,exitTime:b.time,reason:out.reason,r:net/p.riskUnit});p=null;}continue;}
     if(i===end-1||Date.parse(b.time)-Date.parse(bars[i-1].time)>30*60000)continue;
-    const s=signal(bars.slice(Math.max(0,i-analysisWindow),i),strategy);if(s.side==='HOLD')continue;
+    let q=contextCache?.bars===bars?contextCache.values.get(i):null;const prefix=bars.slice(Math.max(0,i-analysisWindow),i);if(!q){q=indicators(prefix);if(contextCache?.bars===bars)contextCache.values.set(i,q);}const s=signal(prefix,strategy,q);if(s.side==='HOLD')continue;
     const plan=executionPlan(s,{price:b.open},{feeBps,feePerUnit,slippageBps});if(!plan.valid)continue;
     const {entry,stop,target}=plan,dir=s.side==='BUY'?1:-1,distance=plan.riskDistance;
     p={side:s.side,entry,stop,target,distance,riskUnit:plan.netRisk,index:i,time:b.time,signalTime:s.time,strategy};
@@ -550,7 +552,8 @@ export function backtest(bars,strategy,{start=60,end=bars.length,feeBps=2,feePer
 }
 export function laboratory(dataset){
   const b=dataset.bars,n=b.length,a=Math.floor(n*.5),v=Math.floor(n*.75),cost=costForSymbol(dataset.symbol);
-  const results=strategies.map(s=>({...s,train:backtest(b,s.id,{...cost,end:a}),validation:backtest(b,s.id,{...cost,start:a,end:v}),test:backtest(b,s.id,{...cost,start:v}),cost}));
+  const contextCache={bars:b,values:new Map()};
+  const results=strategies.map(s=>({...s,train:backtest(b,s.id,{...cost,end:a,contextCache}),validation:backtest(b,s.id,{...cost,start:a,end:v,contextCache}),test:backtest(b,s.id,{...cost,start:v,contextCache}),cost}));
   const eligible=results.filter(r=>r.validation.n>=20&&r.validation.expectancy>0).sort((x,y)=>y.validation.expectancy-x.validation.expectancy);
   const selected=eligible[0]?.id??null;
   return {symbol:dataset.symbol,source:dataset.source,from:b[0]?.time,to:b.at(-1)?.time,bars:n,split:[.5,.25,.25],selected,results};

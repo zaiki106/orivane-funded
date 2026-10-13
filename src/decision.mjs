@@ -1,3 +1,4 @@
+import {advancedStrategies,advancedChecks} from './advanced-strategies.mjs';
 import {auditProbabilityRows} from './probability-audit.mjs';
 import {fitRegularizedLDA,predictRegularizedLDA,validLinearDiscriminant,ldaAlgorithm} from './regularized-lda.mjs';
 import {pricePatternChecks} from './price-patterns.mjs';
@@ -9,8 +10,8 @@ import {fitRegularizedQDA,predictRegularizedQDA,validDiscriminantModel,qdaAlgori
 import {fitNeuralNetwork,predictNeuralNetwork,validNeuralModel,neuralAlgorithm} from './neural-network.mjs';
 
 export const classes=['UP','DOWN','FLAT'];
-export const featureNames=['return1Atr','return4Atr','return12Atr','emaFastAtr','emaSlowAtr','rsiCentered','macdHistogramAtr','atrFraction','bandPosition','logVolumeRatio','volumeAvailable','h1Direction','h1Available'];
-export const decisionVersion='regime-classifier-v6';
+export const featureNames=['return1Atr','return4Atr','return12Atr','emaFastAtr','emaSlowAtr','rsiCentered','macdHistogramAtr','atrFraction','bandPosition','logVolumeRatio','volumeAvailable','h1Direction','h1Available','efficiency10','choppiness14','regressionSlopeAtr','regressionR2','candleBodyAtr','closeLocation'];
+export const decisionVersion='regime-classifier-v8';
 export const featureWindow=analysisWindow;
 export const signalPolicy=Object.freeze({id:'confidence-above-60-v1',minimumPercent:60,comparison:'>'});
 const version=decisionVersion;
@@ -50,6 +51,7 @@ export function higherTimeframe(bars){
 function routeFrom(q,h1,router){
   const make=(strategy,regime,why,setupPresent=true)=>({strategy,regime,why,setupPresent,higherTimeframe:h1,version,policy:'regime-structure-v5'});
   if(!q||q.atr<=0)return make('pullback','Unavailable','Historique ou volatilité insuffisants');
+  const advancedRoute=()=>{for(const rule of advancedStrategies){const checks=advancedChecks(q,rule.id);if(checks.BUY.every(c=>c.passed)||checks.SELL.every(c=>c.passed))return make(rule.id,'Advanced structure',rule.description);}return null;};
   const x=q.last,p=q.previous,compression=q.previousBand.width>0&&q.previousBand.width<=q.squeezeThreshold*.9,body=Math.abs(x.close-x.open),bull=x.close>x.open,bear=x.close<x.open,volumeOK=!q.hasVolume||q.volumeRatio>=1.2,expanded=x.high-x.low>q.atr*.8;
   // Fixed regime + observable structure precedence, before evaluating ONE rule.
   // Compression without a break is a context, not a completed squeeze setup.
@@ -95,10 +97,12 @@ function routeFrom(q,h1,router){
   if(aligned&&q.trend>router.trendThreshold){
     if(q.e9>q.e21&&p.low<=q.previousE9&&x.close>p.high&&q.rsi>45&&q.rsi<72||q.e9<q.e21&&p.high>=q.previousE9&&x.close<p.low&&q.rsi>28&&q.rsi<55)return make('pullback','Trend pullback','Repli EMA 9 terminé puis rupture de reprise');
     if(q.hasVolume&&(p.low<=q.previousVwap&&x.close>q.vwap&&q.e21>q.previousE21&&x.close>p.high||p.high>=q.previousVwap&&x.close<q.vwap&&q.e21<q.previousE21&&x.close<p.low))return make('vwap','Trend pullback','Repli VWAP glissante et rupture de reprise confirmés');
+    const continuation=signal([], 'continuation',q);if(continuation.side==='HOLD'){const extra=advancedRoute();if(extra)return extra;}
     return make('continuation','Trend','Tendance persistante : chercher un corps directionnel, sans exiger un nouveau croisement',body>=q.atr*.2);
   }
   if(q.trend<.65&&(p.close<q.previousBand.lower&&x.close>=q.lower&&x.close>p.close&&q.rsi<45||p.close>q.previousBand.upper&&x.close<=q.upper&&x.close<p.close&&q.rsi>55))return make('reversion','Range recovery','Excès Bollinger précédent et réintégration confirmée');
   if(supertrendSetup)return make('supertrend','Directional continuation','Supertrend établi avec rupture précédente et corps directionnel');
+  const extra=advancedRoute();if(extra)return extra;
   if(q.trend<.65)return make('stochastic','Range','Marché peu directionnel : attendre un retournement stochastique confirmé',false);
   return make('continuation','Transition','Aucune structure terminée : attendre une continuation EMA confirmée',false);
 }
@@ -114,6 +118,7 @@ function featurePoint(bars,index){
   const history=bars.slice(Math.max(0,index-featureWindow+1),index+1),q=indicators(history);if(!q||q.atr<=0)return null;
   const x=q.last.close,atr=q.atr,h1=higherTimeframe(history);
   const features=[(x-bars[index-1].close)/atr,(x-bars[index-4].close)/atr,(x-bars[index-12].close)/atr,(q.e9-q.e21)/atr,(q.e21-q.e50)/atr,(q.rsi-50)/50,(q.macd-q.macdSignal)/atr,atr/x,(x-q.mean)/Math.max(2*q.sd,atr*.1),q.hasVolume?Math.log1p(q.volumeRatio)-Math.log(2):0,q.hasVolume?1:0,h1.available?(h1.direction==='UP'?1:h1.direction==='DOWN'?-1:0):0,h1.available?1:0];
+  const a=q.advanced;features.push(a?.efficiency??0,Number.isFinite(a?.chop)?a.chop/100:0,(a?.regression?.slope??0)/atr,a?.regression?.r2??0,(q.last.close-q.last.open)/atr,q.last.high>q.last.low?(2*q.last.close-q.last.high-q.last.low)/(q.last.high-q.last.low):0);
   if(features.some(x=>!Number.isFinite(x)))return null;
   return {index,time:bars[index].time,features,atr,atrFraction:atr/x,trend:q.trend};
 }
@@ -194,7 +199,10 @@ export function calibrateDecision(dataset,options={}){
   const range=rows=>({from:rows[0]?.time??null,to:rows.at(-1)?.labelEndTime??null,sample:rows.length,classSamples:counts(rows)});
   const model={version,symbol:dataset.symbol??null,source:dataset.source??null,timeframe:config.timeframe,featureWindow,featureNames:[...featureNames],classes:[...classes],cost:config.cost,router,event:{kind:'market_class_probability',description:'Direction nette à '+(config.horizonBars*config.timeframe)+' min',horizonBars:config.horizonBars,horizonMinutes:config.horizonBars*config.timeframe,neutralAtr:config.neutralAtr,definition:'UP/DOWN si le rendement clôture à clôture dépasse ±('+config.neutralAtr+' ATR initial / cours initial + coûts aller-retour), sinon FLAT'},split:{fractions:[.5,.25,.25],gapBars:gap,train:{start:0,end:trainEnd},calibration:{start:trainEnd+gap,end:calibrationEnd},test:{start:calibrationEnd+gap,end:n},bars:n,discardedHistory:all.length-n},trainingRange:range(train),calibrationRange:range(calibration),testRange:range(test),trainedThrough:closeTime(trainEnd-1),calibratedThrough:closeTime(calibrationEnd-1),asOf:closeTime(n-1),status:'insufficient',reason:'Historique ou classes trop peu représentés',calibrated:false,audited:false,scaler:null,weights:null,temperature:null,classPrior:null,training:null,calibration:null,test:null};
   Object.assign(model,{algorithm:null,selection:null,neighbors:null,neighborCount:null,logisticTemperature:null,discriminant:null,neural:null,linearDiscriminant:null});
-  const enough=train.length>=config.minTrainSamples&&calibration.length>=config.minCalibrationSamples&&classes.every(label=>counts(train)[label]>=config.minClassSamples&&counts(calibration)[label]>=config.minCalibrationClassSamples);
+  // All classes must be learned on train. Validation can genuinely contain no
+  // large moves (e.g. a quiet weekend); scoring it needs no per-class fitting.
+  // Keep it chronological and retain the independent held-out publication gate.
+  const enough=train.length>=config.minTrainSamples&&calibration.length>=config.minCalibrationSamples&&classes.every(label=>counts(train)[label]>=config.minClassSamples);
   if(!enough)return model;
   model.algorithm='multinomial-logistic';
   model.scaler=standardizer(train);model.weights=fitLogistic(train,model.scaler,config);model.classPrior=classes.map(label=>counts(train)[label]/train.length);

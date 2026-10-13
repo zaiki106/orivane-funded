@@ -13,7 +13,9 @@ export function executionPlan(signal,quote=null,cost={feeBps:0,slippageBps:0}){
   const stopCrossed=Boolean(quote&&positive(currentPrice)&&direction*(currentPrice-stop)<=0);
   const targetCrossed=Boolean(quote&&positive(currentPrice)&&direction*(target-currentPrice)<=0);
   const levelsCrossed=Boolean(quote&&positive(entry)&&(direction*(entry-stop)<=0||direction*(target-entry)<=0));
-  const drifted=Boolean(quote&&positive(entry)&&positive(atr)&&Math.abs(entry-referenceEntry)>.5*atr);
+  // Market drift compares the executable quote with the signal price. Slippage
+  // belongs in net risk/reward; adding it here can reject an unchanged market.
+  const drifted=Boolean(quote&&positive(base)&&positive(atr)&&Math.abs(base-referenceEntry)>.5*atr);
   const exitStop=validCost?stop*(1-direction*cost.slippageBps/10000):null;
   const exitTarget=validCost?target*(1-direction*cost.slippageBps/10000):null;
   const netRisk=positive(entry)&&positive(exitStop)?direction*(entry-exitStop)+roundTripFee(cost,entry,exitStop):null;

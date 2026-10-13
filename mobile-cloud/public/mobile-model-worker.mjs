@@ -8,7 +8,7 @@ self.onmessage=({data:m})=>{
  if(m.type!=='model-request')return;
  const {symbol,version,dataset}=m;
  try{
-  const model=calibrateDecision(dataset,{cost:costForSymbol(symbol)});
+  const model=calibrateDecision(dataset,{cost:costForSymbol(symbol),classCalibration:true,maxHistory:5000});
   postMessage({type:'model-fit',symbol,version,model});
   let lab=null,replay=null;
   try{lab=laboratory(dataset);lab.datasetVersion=version;lab.research=walkForwardResearch(dataset);replay=replayDecisions(dataset,model);replay.stress={costMultiplier:2,metrics:replayDecisions(dataset,model,{costMultiplier:2}).metrics};}catch{}

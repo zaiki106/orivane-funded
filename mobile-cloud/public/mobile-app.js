@@ -1,5 +1,5 @@
 import {SignalAlertTracker} from '/signal-alerts.js';
-import {deviceApi,DeviceStateStream} from '/mobile-bridge.mjs';
+import {deviceApi,DeviceStateStream} from '/mobile-bridge.mjs?v=direction03';
 let newsExpanded=false,workspace='overview';
 let state,tab='radar',symbol='BTC/USD',busy=false,streamConnected=false,lastStreamAt=0;
 let rangeCount=window.innerWidth<650?30:58,panOffset=0,crosshair=null,drag=null,renderedSymbol=null,positionsKey='',lastFallbackAt=0,modelOpen=false,diagnostics=null;

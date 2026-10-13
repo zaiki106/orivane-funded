@@ -1,4 +1,4 @@
-import {validateBars,strategies,sizePosition} from './core/engine.mjs';
+import {validateBars,strategies,sizePosition,signal,indicators,analysisWindow} from './core/engine.mjs';
 import {decide,signalPolicy} from './core/decision.mjs';
 import {applyModelAssessment} from './core/model-assessment.mjs';
 import {costForSymbol,roundTripFee} from './core/cost-policy.mjs';
@@ -20,7 +20,8 @@ function update(u){const d=datasets.get(u.symbol);if(!d)return;if(u.quote)d.quot
 function closeBar(symbol,bar){const d=datasets.get(symbol);if(d)install({...d,bars:[...d.bars,bar]});}
 function install(value){
  const bars=validateBars(value.bars).filter(b=>b.closed!==false).slice(-2000),prior=datasets.get(value.symbol),fingerprint=JSON.stringify(bars),changed=!prior||prior.fingerprint!==fingerprint;
- datasets.set(value.symbol,{...prior,...value,bars,fingerprint});if(changed){jobs.set(value.symbol,{status:'pending',version:(jobs.get(value.symbol)?.version??0)+1});queue.add(value.symbol);setTimeout(fitNext,0);}emit();
+ const context=changed?indicators(bars.slice(-analysisWindow)):null,closedSignals=changed?strategies.map(rule=>signal(bars.slice(-analysisWindow),rule.id,context)):prior.closedSignals;
+ datasets.set(value.symbol,{...prior,...value,bars,fingerprint,closedSignals});if(changed){jobs.set(value.symbol,{status:'pending',version:(jobs.get(value.symbol)?.version??0)+1});queue.add(value.symbol);setTimeout(fitNext,0);}emit();
 }
 function fitNext(){if(fitting||!queue.size)return;fitting=true;const symbol=queue.values().next().value;queue.delete(symbol);postMessage({type:'model-request',symbol,version:jobs.get(symbol).version,dataset:datasets.get(symbol)});}
 function modelReply(m){
@@ -44,7 +45,7 @@ function current(symbol){const d=datasets.get(symbol),m=models.get(symbol),f=fee
 }
 function rows(){return marketSymbols.map(symbol=>{
  const d=datasets.get(symbol),decision=current(symbol),f=feed(d),job=jobs.get(symbol)??{status:'pending',version:0},live=symbol!=='NDX'&&recent(d),source=d?.source??null;
- const row={symbol,source,timeframe:15,asOf:d?.bars.at(-1)?.time??null,bars:d?.bars.slice(-85)??[],quote:d?.quote??null,currentBar:d?.currentBar??f.currentBar??null,live,provenance:d?.provenance??{},quality:d?.quality??{},feed:{...f,status:d?f.status:'unavailable'},model:job,decision,signal:decision,eligible:profile.allowedSymbols.includes(symbol),signals:[],previewSignals:[],coverage:d?.bars.length??0,execution:live?'Paper sur cet appareil':'Non exécutable'};
+ const row={symbol,source,timeframe:15,asOf:d?.bars.at(-1)?.time??null,bars:d?.bars.slice(-85)??[],quote:d?.quote??null,currentBar:d?.currentBar??f.currentBar??null,live,provenance:d?.provenance??{},quality:d?.quality??{},feed:{...f,status:d?f.status:'unavailable'},model:job,decision,signal:decision,eligible:profile.allowedSymbols.includes(symbol),signals:d?.closedSignals??[],previewSignals:[],coverage:d?.bars.length??0,execution:live?'Paper sur cet appareil':'Non exécutable'};
  row.research=labs.get(symbol)?.datasetVersion===job.version?labs.get(symbol).research:null;row.decisionChecks=decisionDiagnostics(row);row.strategyEvidence=strategyEvidence(labs.get(symbol),decision.strategy);row.replay=replays.get(symbol)??null;
  row.ideas=d?.bars.length>=60?rankIdeas(buildIdeaSetups(d),{quote:d.quote,decision,live,isFresh:recent(d)}):[];
  row.holdReason=explainHold(d,decision,{isFresh:recent(d)});return row;

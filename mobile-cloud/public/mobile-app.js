@@ -46,7 +46,7 @@ function costDescription(cost){
   return (cost.profile==='the5ers'?'The5ers · ':'')+fee+' · glissement '+num(cost.slippageBps,2)+' pb par côté (hypothèse)'+(cost.profile==='the5ers'&&!cost.commissionVerified?' · commission non vérifiée':'')+(cost.profile==='the5ers'?' · spread historique indisponible':'');
 }
 function algorithmName(algorithm){return algorithm==='regularized-lda'?'LDA régularisée':algorithm==='neural-network'?'Réseau neuronal':algorithm==='weighted-knn'?'Analogues kNN':algorithm==='regularized-qda'?'QDA régularisée':algorithm==='multinomial-logistic'?'Régression logistique':'En préparation';}
-function aiStatusLabel(m){const c=decision(m).confidence??{};return c.status==='unvalidated'?'Modèle non retenu':c.algorithm?algorithmName(c.algorithm):m.feed?.status==='closed'?'Marché fermé':['stale','unavailable','error'].includes(c.status)?'Analyse indisponible':'Calcul en cours';}
+function aiStatusLabel(m){const c=decision(m).confidence??{};if(m.model?.status==='pending'||c.status==='pending')return 'Calcul en cours';return c.status==='unvalidated'?'Modèle non retenu':c.algorithm?algorithmName(c.algorithm):m.feed?.status==='closed'?'Marché fermé':['stale','unavailable','error'].includes(c.status)?'Analyse indisponible':'Calcul en cours';}
 function aiProbabilities(m){
   const c=decision(m).confidence??{},ready=pushFresh()&&c.status==='estimate'&&c.classProbs;
   return [['UP','Hausse'],['DOWN','Baisse'],['FLAT','Neutre']].map(([key,label])=>{

@@ -535,7 +535,10 @@ export function metrics(trades){
   return {n,wins:w,winRate:n?100*w/n:null,winInterval:n?[Math.max(0,center-half)*100,Math.min(1,center+half)*100]:null,expectancy:n?equity/n:null,totalR:equity,profitFactor:negative?positive/negative:null,maxDrawdownR:dd};
 }
 export function backtest(bars,strategy,{start=60,end=bars.length,feeBps=2,feePerUnit=0,slippageBps=2,maxBars=16,contextCache=null}={}){
-  bars=bars.filter(bar=>bar.closed!==false);end=Math.min(end,bars.length);
+  // Preserve identity for already closed input so the shared causal contexts
+  // can actually be reused across rules and chronological partitions.
+  if(bars.some(bar=>bar.closed===false))bars=bars.filter(bar=>bar.closed!==false);
+  end=Math.min(end,bars.length);
   const trades=[];let p=null,censored=0;
   for(let i=Math.max(60,start);i<end;i++){
     const b=bars[i];

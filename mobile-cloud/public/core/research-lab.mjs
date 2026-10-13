@@ -12,7 +12,14 @@ export function walkForwardResearch(dataset){
   folds.push({trainThrough:bars[start-1].time,testFrom:bars[start].time,testTo:bars[end-1].time,selected:selected?.id??null,train:selected?metrics(selected.train.trades):null,test:selected?backtest(bars,selected.id,{...cost,start,end,contextCache}):null});
  }
  const trades=folds.flatMap(f=>f.test?.trades??[]),report=metrics(trades);
- return {status:report.n>=20?'available':'insufficient',kind:'expanding-train-walk-forward',selection:'train-only-net-expectancy',refitsModel:false,confidenceUnchanged:true,folds,metrics:report,expectancyInterval:blockBootstrap(trades.map(t=>t.r)),cost};
+ const costStress=[1,2,3].map(multiplier=>{
+  if(multiplier===1)return {multiplier,metrics:report};
+  const stressed={...cost,feeBps:cost.feeBps*multiplier,slippageBps:cost.slippageBps*multiplier,...(cost.feePerUnit!==undefined?{feePerUnit:cost.feePerUnit*multiplier}:{})};
+  const outcomes=folds.flatMap(f=>f.selected?backtest(bars,f.selected,{...stressed,start:bars.findIndex(b=>b.time===f.testFrom),end:bars.findIndex(b=>b.time===f.testTo)+1,contextCache}).trades:[]);
+  return {multiplier,metrics:metrics(outcomes)};
+ });
+ return {status:report.n>=20?'available':'insufficient',kind:'expanding-train-walk-forward',selection:'train-only-net-expectancy',refitsModel:false,confidenceUnchanged:true,folds,metrics:report,expectancyInterval:blockBootstrap(trades.map(t=>t.r)),cost,
+  costStress:{kind:'frozen-rule-cost-stress',selectionFrozen:true,partition:'next-fold',scenarios:costStress}};
 }
 export function blockBootstrap(values,{iterations=400,block=3,seed=20261013}={}){
  if(!Array.isArray(values)||values.some(v=>!Number.isFinite(v))||!Number.isInteger(iterations)||iterations<100||iterations>10000||!Number.isInteger(block)||block<1)throw Error('Bootstrap invalide');

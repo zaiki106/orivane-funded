@@ -1,4 +1,5 @@
 // A publication gate, not a model selector or a claim of trading profitability.
+import {modelForDirection} from './decision.mjs';
 // The held-out report is consulted only to suppress unsupported estimates.
 export function assessModel(model){
   const report=model?.test;
@@ -31,6 +32,7 @@ export function applyModelAssessment(decision,model){
 // Score the actual BUY/SELL event as one-vs-rest. A bad FLAT estimate alone
 // must not veto a independently tested UP/DOWN estimate. No model is reselected.
 export function assessDirection(model,className){
+  model=modelForDirection(model,className);
   const report=model?.test,event=report?.directional?.[className];
   const valid=['UP','DOWN'].includes(className)&&model?.audited===true&&
     Number.isInteger(report?.sample)&&report.sample>=40&&event?.sample===report.sample&&

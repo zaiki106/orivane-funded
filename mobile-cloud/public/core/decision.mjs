@@ -217,6 +217,9 @@ export function calibrateDecision(dataset,options={}){
   for(let i=0;i<=40;i++){const temperature=Math.exp(Math.log(.25)+i*Math.log(16)/40),loss=diagnostics(calibration,model,temperature).logLoss;if(loss<bestLoss){bestLoss=loss;bestTemperature=temperature;}}
   model.temperature=bestTemperature;model.logisticTemperature=bestTemperature;
   const logisticCalibration=diagnostics(calibration,model),candidates=[{algorithm:model.algorithm,k:null,shrinkage:null,hiddenUnits:null,temperature:bestTemperature,brier:logisticCalibration.brier,logLoss:logisticCalibration.logLoss,sample:calibration.length}];
+  const directionalPool=[];
+  const retain=(candidateModel,report,temperature=candidateModel.temperature)=>{if(options.directionalExperts===true)directionalPool.push({model:{...candidateModel,temperature,classCalibration:null},report});};
+  retain(model,logisticCalibration);
   model.neighbors=fitNearestNeighbors(train,model.scaler,{k:31});
   let selected=candidates[0],selectedCalibration=logisticCalibration;
   if(model.neighbors){
@@ -224,6 +227,7 @@ export function calibrateDecision(dataset,options={}){
       if(train.length<=k)continue;
       const candidateModel={...model,algorithm:neighborAlgorithm,neighborCount:k,temperature:1},report=diagnostics(calibration,candidateModel),candidate={algorithm:neighborAlgorithm,k,shrinkage:null,hiddenUnits:null,temperature:1,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
       candidates.push(candidate);
+      retain(candidateModel,report,1);
       // Ties retain the simpler logistic model or the earlier smaller k.
       if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
     }
@@ -241,6 +245,7 @@ export function calibrateDecision(dataset,options={}){
     }
     const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:qdaAlgorithm,k:null,shrinkage,hiddenUnits:null,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
     candidates.push(candidate);
+    retain(candidateModel,report,temperature);
     if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;model.discriminant=discriminant;}
   }
   for(const hiddenUnits of [8,16]){
@@ -256,6 +261,7 @@ export function calibrateDecision(dataset,options={}){
     }
     const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:neuralAlgorithm,k:null,shrinkage:null,hiddenUnits,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
     candidates.push(candidate);
+    retain(candidateModel,report,temperature);
     if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;model.neural=neural;}
   }
   let bestLdaBrier=Infinity;
@@ -265,7 +271,7 @@ export function calibrateDecision(dataset,options={}){
     let temperature=1,loss=diagnostics(calibration,candidateModel,1).logLoss;
     for(let i=0;i<=40;i++){const next=Math.exp(Math.log(.25)+i*Math.log(16)/40),nextLoss=diagnostics(calibration,candidateModel,next).logLoss;if(nextLoss<loss){loss=nextLoss;temperature=next;}}
     const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:ldaAlgorithm,k:null,shrinkage,hiddenUnits:null,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
-    candidates.push(candidate);if(candidate.brier<bestLdaBrier){model.linearDiscriminant=linearDiscriminant;bestLdaBrier=candidate.brier;}
+    candidates.push(candidate);retain(candidateModel,report,temperature);if(candidate.brier<bestLdaBrier){model.linearDiscriminant=linearDiscriminant;bestLdaBrier=candidate.brier;}
     if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
   }
   if(options.boosting===true){
@@ -274,7 +280,7 @@ export function calibrateDecision(dataset,options={}){
       let temperature=1,loss=diagnostics(calibration,candidateModel,1).logLoss;
       for(let i=0;i<=40;i++){const next=Math.exp(Math.log(.25)+i*Math.log(16)/40),nextLoss=diagnostics(calibration,candidateModel,next).logLoss;if(nextLoss<loss){loss=nextLoss;temperature=next;}}
       const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:boostingAlgorithm,k:null,shrinkage:null,hiddenUnits:null,rounds:model.boosted.rounds,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
-      candidates.push(candidate);if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
+      candidates.push(candidate);retain(candidateModel,report,temperature);if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
     }
   }
   model.algorithm=selected.algorithm;model.neighborCount=selected.k;model.temperature=selected.temperature;
@@ -292,7 +298,25 @@ export function calibrateDecision(dataset,options={}){
   model.test.robustness=auditProbabilityRows(test.map(row=>({...row,probabilities:probabilities(row.features,model)})),model.classPrior);
   model.training.labelCoverage=train.length/Math.max(1,trainEnd-gap-59);model.calibration.labelCoverage=calibration.length/Math.max(1,calibrationEnd-trainEnd-2*gap);model.test.labelCoverage=test.length/Math.max(1,n-calibrationEnd-2*gap);
   model.status='estimate';model.reason='Un seul classifieur sélectionné sur validation ; diagnostic final séparé des paramètres';model.calibrated=model.algorithm!==neighborAlgorithm;model.calibrationMethod=model.calibrated?'temperature-scaling':'neighbor-count-validation';model.audited=test.length>=config.minTestSamples;
+  if(options.directionalExperts===true){
+    model.directionalExperts={};
+    model.expertSelection={enabled:true,metric:'one-vs-rest-brier',partition:'calibration',holdoutUsed:false,trainingRefit:false,candidates:directionalPool.map(c=>({algorithm:c.model.algorithm,k:c.model.neighborCount??null,temperature:c.model.temperature,UP:c.report.directional.UP.brier,DOWN:c.report.directional.DOWN.brier}))};
+    for(const direction of ['UP','DOWN']){
+      // No averaging or voting: exactly one full classifier supplies the event.
+      const best=directionalPool.reduce((winner,c)=>c.report.directional[direction].brier<winner.report.directional[direction].brier?c:winner),expert={...best.model,status:'estimate',calibrated:best.model.algorithm!==neighborAlgorithm,audited:model.audited,selection:{metric:'one-vs-rest-brier',class:direction,partition:'calibration',holdoutUsed:false,trainingRefit:false},classCalibration:null};
+      let report=best.report;
+      if(options.classCalibration===true){const fitted=fitClassCalibration(calibration.map(row=>({probabilities:rawProbabilities(row.features,expert),actual:classes.indexOf(row.label)})));if(fitted){const adjusted=diagnostics(calibration,{...expert,classCalibration:fitted});if(adjusted.directional[direction].brier<report.directional[direction].brier){expert.classCalibration=fitted;expert.calibrated=true;report=adjusted;}}}
+      expert.calibration=report;expert.test=diagnostics(test,expert);expert.training=diagnostics(train,expert,1,{excludeTrainingSelf:expert.algorithm===neighborAlgorithm});
+      model.directionalExperts[direction]=expert;
+    }
+  }
   return model;
+}
+
+export function modelForDirection(model,direction){
+  if(!model?.expertSelection?.enabled||!['UP','DOWN'].includes(direction))return model;
+  const expert=model.directionalExperts?.[direction];
+  return expert?.version===model.version&&expert.symbol===model.symbol&&expert.source===model.source&&expert.calibratedThrough===model.calibratedThrough&&expert.selection?.class===direction?expert:null;
 }
 
 export function predictMarketClass(bars,model){
@@ -316,7 +340,7 @@ export function predictMarketClass(bars,model){
 export function decide(bars,model=null,options={}){
   const b=closed(bars),route=routeStrategy(b,model?.version===version?model.router:null),raw=signal(b.slice(-featureWindow),route.strategy),h1=route.higherTimeframe,stale=options.fresh===false;
   const opposed=h1.available&&(raw.side==='BUY'&&h1.direction==='DOWN'||raw.side==='SELL'&&h1.direction==='UP');
-  const classProbs=stale?null:predictMarketClass(b,model),candidateSide=['BUY','SELL'].includes(raw.side)?raw.side:null,candidateClass=candidateSide==='BUY'?'UP':candidateSide==='SELL'?'DOWN':null;
+  const candidateSide=['BUY','SELL'].includes(raw.side)?raw.side:null,candidateClass=candidateSide==='BUY'?'UP':candidateSide==='SELL'?'DOWN':null,eventModel=modelForDirection(model,candidateClass),classProbs=stale?null:predictMarketClass(b,eventModel);
   const plan=candidateSide?executionPlan(raw,options.quote??null,options.cost??model?.cost??costForSymbol(options.symbol??model?.symbol)):null;
   const invalidStructuralPlan=plan?.invalidStructure??false,filteredByLevels=plan?.filteredByLevels??false,filteredByPrice=plan?.filteredByPrice??false,filteredByCosts=plan?.filteredByCosts??false;
   // Compare the published tenth-percent value, so BUY/SELL can never display 60.0%.
@@ -332,8 +356,8 @@ export function decide(bars,model=null,options={}){
     referenceTime=Number.isFinite(referenceMs)?new Date(referenceMs).toISOString():null,
     referencePrice=Number.isFinite(b.at(-1)?.close)?b.at(-1).close:null,
     horizonEndAt=Number.isFinite(referenceMs)&&Number.isFinite(horizonMinutes)?new Date(referenceMs+horizonMinutes*60000).toISOString():null;
-  const neighborDetail=classProbs&&model.algorithm===neighborAlgorithm?neighborPrediction(featurePoint(b,b.length-1).features,model):null;
-  const confidence={percent:classProbs?Math.round(classProbs[selectedClass]*1000)/10:null,kind:'market_class_probability',event:model?.event?.description??'Direction nette à 60 min',horizonBars:model?.event?.horizonBars??4,horizonMinutes,referenceTime,referencePrice,horizonEndAt,cost:model?.cost??null,class:selectedClass,classProbs,algorithm:classProbs?(model.algorithm??'multinomial-logistic'):null,neighboursCount:neighborDetail?.neighborsCount??0,neighboursEffectiveSample:neighborDetail?.effectiveNeighbors??null,neighboursDetail:neighborDetail?.detail??[],sample:model?.trainingRange?.sample??0,calibrationSample:model?.calibrationRange?.sample??0,testSample:model?.testRange?.sample??0,classSamples:model?.trainingRange?.classSamples??null,calibrated:Boolean(classProbs&&model?.calibrated),audited:Boolean(classProbs&&model?.audited),status:stale?'stale':classProbs?'estimate':'insufficient',reason:stale?reason:classProbs?'Probabilité du mouvement net à 1 h ; distincte du taux de trades gagnants':futureModel?'Modèle postérieur à cette bougie':model?.reason??'Modèle historique en préparation',trainingRange:model?.trainingRange??null};
+  const neighborDetail=classProbs&&eventModel.algorithm===neighborAlgorithm?neighborPrediction(featurePoint(b,b.length-1).features,eventModel):null;
+  const confidence={percent:classProbs?Math.round(classProbs[selectedClass]*1000)/10:null,kind:'market_class_probability',event:model?.event?.description??'Direction nette à 60 min',horizonBars:model?.event?.horizonBars??4,horizonMinutes,referenceTime,referencePrice,horizonEndAt,cost:model?.cost??null,class:selectedClass,classProbs,algorithm:classProbs?(eventModel.algorithm??'multinomial-logistic'):null,neighboursCount:neighborDetail?.neighborsCount??0,neighboursEffectiveSample:neighborDetail?.effectiveNeighbors??null,neighboursDetail:neighborDetail?.detail??[],sample:model?.trainingRange?.sample??0,calibrationSample:model?.calibrationRange?.sample??0,testSample:model?.testRange?.sample??0,classSamples:model?.trainingRange?.classSamples??null,calibrated:Boolean(classProbs&&eventModel?.calibrated),audited:Boolean(classProbs&&eventModel?.audited),status:stale?'stale':classProbs?'estimate':'insufficient',reason:stale?reason:classProbs?'Probabilité du mouvement net à 1 h ; distincte du taux de trades gagnants':futureModel?'Modèle postérieur à cette bougie':model?.reason??'Modèle historique en préparation',trainingRange:model?.trainingRange??null};
   return {...raw,side,reason,riskDistance:side==='HOLD'?raw.riskDistance:plan.riskDistance,entry:side==='HOLD'?null:plan.entry,stop:side==='HOLD'?null:raw.stop,target:side==='HOLD'?null:raw.target,
     invalidation:invalidStructuralPlan?null:raw.invalidation,
     setup:raw.setup?{...raw.setup,confirmed:side!=='HOLD',entry:side==='HOLD'?null:plan.entry,...(invalidStructuralPlan?{stop:null,target:null,invalidation:null}:{})}:undefined,

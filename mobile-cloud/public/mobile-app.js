@@ -1,5 +1,5 @@
 import {SignalAlertTracker} from '/signal-alerts.js';
-import {deviceApi,DeviceStateStream} from '/mobile-bridge.mjs?v=exit04';
+import {deviceApi,DeviceStateStream} from '/mobile-bridge.mjs?v=max06';
 let newsExpanded=false,workspace='overview';
 let state,tab='radar',symbol='BTC/USD',busy=false,streamConnected=false,lastStreamAt=0;
 let rangeCount=window.innerWidth<650?30:58,panOffset=0,crosshair=null,drag=null,renderedSymbol=null,positionsKey='',lastFallbackAt=0,modelOpen=false,diagnostics=null;
@@ -45,7 +45,7 @@ function costDescription(cost){
   const fee=cost.feePerUnit?num(cost.feePerUnit*(cost.contractSize??100000)*2,2)+' $ / lot aller-retour':num(cost.feeBps,2)+' pb de frais par côté';
   return (cost.profile==='the5ers'?'The5ers · ':'')+fee+' · glissement '+num(cost.slippageBps,2)+' pb par côté (hypothèse)'+(cost.profile==='the5ers'&&!cost.commissionVerified?' · commission non vérifiée':'')+(cost.profile==='the5ers'?' · spread historique indisponible':'');
 }
-function algorithmName(algorithm){return algorithm==='regularized-lda'?'LDA régularisée':algorithm==='neural-network'?'Réseau neuronal':algorithm==='weighted-knn'?'Analogues kNN':algorithm==='regularized-qda'?'QDA régularisée':algorithm==='multinomial-logistic'?'Régression logistique':'En préparation';}
+function algorithmName(algorithm){return algorithm==='gradient-boosted-stumps'?'Gradient boosting':algorithm==='regularized-lda'?'LDA régularisée':algorithm==='neural-network'?'Réseau neuronal':algorithm==='weighted-knn'?'Analogues kNN':algorithm==='regularized-qda'?'QDA régularisée':algorithm==='multinomial-logistic'?'Régression logistique':'En préparation';}
 function aiStatusLabel(m){const c=decision(m).confidence??{};if(m.model?.status==='pending'||c.status==='pending')return 'Calcul en cours';return c.status==='unvalidated'?'Modèle non retenu':c.algorithm?algorithmName(c.algorithm):m.feed?.status==='closed'?'Marché fermé':['stale','unavailable','error'].includes(c.status)?'Analyse indisponible':'Calcul en cours';}
 function aiProbabilities(m){
   const c=decision(m).confidence??{},ready=pushFresh()&&c.status==='estimate'&&c.classProbs;
@@ -65,7 +65,7 @@ function aiModelDetails(m,c,model){
   if(!c.algorithm&&!candidates.length)return '';
   return '<section class="ai-method"><h3>IA locale · '+esc(algorithmName(model?.algorithm??c.algorithm))+(c.algorithm==='weighted-knn'?' · '+(c.neighboursCount??0)+' analogues':'')+'</h3>'+(candidates.length?'<div class="ai-comparison">'+candidates.map(row=>{
     const chosen=row.algorithm===active&&(row.algorithm!=='weighted-knn'||row.k===k)&&(!['regularized-qda','regularized-lda'].includes(row.algorithm)||row.shrinkage===shrinkage)&&(row.algorithm!=='neural-network'||row.hiddenUnits===hiddenUnits);
-    return '<div class="'+(chosen?'chosen':'')+'"><span>'+esc(algorithmName(row.algorithm))+(row.k?' · k='+row.k:'')+(['regularized-qda','regularized-lda'].includes(row.algorithm)?' · α='+num(row.shrinkage,2):'')+(row.algorithm==='neural-network'?' · '+row.hiddenUnits+' neurones':'')+(chosen?' ✓':'')+'</span><b>'+num(row.brier,3)+'</b></div>';
+    return '<div class="'+(chosen?'chosen':'')+'"><span>'+esc(algorithmName(row.algorithm))+(row.rounds?' · '+row.rounds+' étapes':'')+(row.k?' · k='+row.k:'')+(['regularized-qda','regularized-lda'].includes(row.algorithm)?' · α='+num(row.shrinkage,2):'')+(row.algorithm==='neural-network'?' · '+row.hiddenUnits+' neurones':'')+(chosen?' ✓':'')+'</span><b>'+num(row.brier,3)+'</b></div>';
   }).join('')+'</div><p>Un modèle retenu sur validation chronologique · Brier plus bas = mieux. Le test séparé ne choisit pas le modèle.</p>'+(candidates.some(row=>row.algorithm==='regularized-qda')?'<p>LDA : covariance partagée entre directions. QDA : covariance propre à chaque direction, régularisée par α. Probabilités ajustées en température sur validation.</p>':''):'')+(neighbours.length?'<h4>Configurations historiques proches</h4><div class="ai-neighbours">'+neighbours.slice(0,5).map(row=>'<div title="'+esc('Issue observée à '+date(row.labelEndTime)+' · distance standardisée '+num(row.distance,3))+'"><time>'+date(row.time)+'</time><span>'+esc(row.label==='UP'?'Hausse':row.label==='DOWN'?'Baisse':'Neutre')+'</span><small>d '+num(row.distance,2)+'</small></div>').join('')+'</div><p>'+esc(m.source)+' · rendements nets à 1 h après coûts hypothétiques ; ce ne sont pas des trades gagnants.</p>':'')+'</section>';
 }
 function evidenceFor(m){const e=m.strategyEvidence;return e&&e.strategy===decision(m).strategy&&['available','insufficient'].includes(e.status)?e:null;}
@@ -241,4 +241,6 @@ document.addEventListener('click',e=>{const more=e.target.closest('[data-news-mo
   root.classList.add('motion-ready');schedule();
 })();
 
-function researchDetails(m){const r=m.research;if(!r)return '<p>Validation en calcul.</p>';const folds=r.folds??[];return '<div class="replay-blocks">'+folds.map((f,i)=>'<span>Période '+(i+1)+'<b>'+esc(f.selected??'Aucune règle validée')+'</b></span>').join('')+'</div><p>Choix sur historique antérieur uniquement · '+(r.metrics?.n??0)+' trades hors échantillon.</p>'+(r.expectancyInterval?.interval?'<p>Intervalle bootstrap de l’espérance : '+r.expectancyInterval.interval.map(v=>num(v,2)).join(' à ')+' R. Diagnostic historique.</p>':'<p>Échantillon trop court pour un intervalle.</p>');}
+function researchDetails(m){const r=m.research;if(!r)return '<p>Validation en calcul.</p>';const folds=r.folds??[];return '<div class="replay-blocks">'+folds.map((f,i)=>'<span>Période '+(i+1)+'<b>'+esc(f.selected??'Aucune règle validée')+'</b></span>').join('')+'</div>'+researchStress(r)+'<p>Choix sur historique antérieur uniquement · '+(r.metrics?.n??0)+' trades hors échantillon.</p>'+(r.expectancyInterval?.interval?'<p>Intervalle bootstrap de l’espérance : '+r.expectancyInterval.interval.map(v=>num(v,2)).join(' à ')+' R. Diagnostic historique.</p>':'<p>Échantillon trop court pour un intervalle.</p>');}
+
+function researchStress(r){const stress=r.costStress;if(!stress?.selectionFrozen)return '';return '<details class="ai-evidence" data-key="research-cost-stress"><summary><span>Stress des frais</span><span>×1 / ×2 / ×3</span></summary><div class="replay-blocks">'+stress.scenarios.map(s=>'<span>Frais ×'+s.multiplier+'<b>'+s.metrics.n+' trades · '+num(s.metrics.expectancy,2)+' R</b></span>').join('')+'</div><p>Règle choisie avant chaque période ; aucune resélection pour améliorer le scénario.</p></details>';}

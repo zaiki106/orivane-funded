@@ -30,3 +30,7 @@ Tendance, cassures, réversion, structures de prix, volatilité, sessions et mul
 ## Droits et publication
 
 Les bibliothèques restent des dépendances distinctes et leurs notices sont conservées. Les archives, tokens locaux, journaux, clés, venv, bases et expériences privées restent hors du dépôt public et du déploiement. Les modèles compacts et rapports agrégés sont les seuls artefacts de recherche destinés au téléphone. La présence d’un modèle dans le manifeste n’implique pas sa promotion paper.
+
+## Extension indépendante de stratégies
+
+Optuna 4.5.0 (MIT, commit d7e1c1b306b995aa53719ed6ab18e871ae0d52a5) est intégré au laboratoire PC. Le [registre de recherche](RESEARCH-LAB.md) détaille la sélection des dépôts, les six recettes, les 432 essais exécutés, les droits, les coûts et les résultats réels. Aucun bot tiers non audité ni service payant n’a été ajouté.

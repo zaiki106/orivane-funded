@@ -21,6 +21,10 @@ async function environment(file,extra={}){
  context.self=context;vm.runInContext(source,context);return {context,messages,close(){for(const id of timers){clearTimeout(id);clearInterval(id);}}};
 }
 import {fixture} from './helpers/worker-fixture.mjs';
+test('research catalogue exposes 72 documented recipes without changing the 66-rule live router',async()=>{
+ const e=await environment('mobile-engine.mjs');
+ try{const result=await vm.runInContext("api('/api/registry')",e.context);assert.equal(result.strategies.length,72);assert.equal(result.researchVersion,'research-recipes-v1');assert.equal(vm.runInContext('strategyRegistry.length',e.context),66);const extra=result.strategies.filter(r=>r.version==='research-recipes-v1');assert.equal(extra.length,6);assert.ok(extra.every(r=>r.status==='research'&&r.parameters.expiryBars===16));}finally{e.close();}
+});
 test('BTC REST recovery replaces a stale streaming price and remains explicitly non-streaming',async()=>{
  const time=Math.floor(Date.now()/900000)*900000,bars=Array.from({length:101},(_,i)=>({time:new Date(time-(100-i)*900000).toISOString(),open:100,high:102,low:99,close:101,volume:100}));
  const rows=bars.map(b=>[Date.parse(b.time)/1000,String(b.open),String(b.high),String(b.low),String(b.close),'100','100',10]);

@@ -102,3 +102,7 @@ node ../orivane-funded/src/upgrade-trade-features.mjs ../orivane-data/experiment
 ```
 
 La migration utilise uniquement les variables originales, la stratégie et l’heure d’entrée connues à la clôture. Elle conserve les labels et partitions, écrit un nouveau fichier et enregistre le SHA256 parent. Les scores sur une période déjà évaluée sont des résultats de réévaluation historique ; ils ne constituent pas une nouvelle période indépendante.
+
+## Laboratoire indépendant de stratégies
+
+`./run-lab.ps1 -Mode research -InputFile ../orivane-data/experiments/BTC_USD-15m.json` exporte les 66 règles et les six recettes de recherche, trois coûts, puis analyse les fenêtres chronologiques avec Optuna 4.5.0. Le budget, le verrou lourd, les SHA256 et les journaux reprenables sont appliqués. Un export déjà créé est conservé : relance avec son fichier `.ndjson` pour reprendre l’analyse. Aucune étude ne promeut un modèle paper. Méthode détaillée : `research/RESEARCH-LAB.md` dans le dépôt principal.

@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('bootstrap','download','normalize','train','api','status','test','verify','collect','replay','qlib')]
+  [ValidateSet('bootstrap','download','normalize','train','api','status','test','verify','collect','replay','qlib','research')]
   [string]$Mode = 'status',
   [string]$InputFile,
   [string]$Instrument = 'BTC/USD',
@@ -54,6 +54,11 @@ try {
     'train' {
       if (!$InputFile) { throw '-InputFile requis : export JSON des configurations reelles' }
       & $taskVenvPython -m orivane_lab.train --root $taskDataRoot --input $InputFile
+    }
+    'research' {
+      if (!$InputFile) { throw '-InputFile requis : jeu reel 15m ou evenements NDJSON' }
+      if ($InputFile.EndsWith('.ndjson')) { & $taskVenvPython -m orivane_lab.strategy_lab --root $taskDataRoot --events $InputFile }
+      else { & $taskVenvPython -m orivane_lab.strategy_lab --root $taskDataRoot --dataset $InputFile }
     }
     'api' { & $taskVenvPython -m orivane_lab.api --root $taskDataRoot --port $Port }
     'status' { & $taskVenvPython -m orivane_lab.status --root $taskDataRoot }

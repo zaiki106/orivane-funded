@@ -32,7 +32,9 @@ node ../orivane-funded/src/export-trade-examples.mjs --input ../orivane-data/exp
 
 La cible est **TP avant SL dans 16 bougies de 15 minutes**. L'expiration sans TP reste un échec de cet événement, même avec un PnL positif. Un horizon incomplet est censuré. Les niveaux et coûts proviennent du même cœur que le replay et le paper.
 
-La logistique et LightGBM sont ajustés sur le développement. La calibration Platt et le choix du modèle utilisent seulement la calibration. Les frontières du cœur sont reprises, avec purge des fins de labels et embargo de quatre heures. Le test final ne choisit pas le modèle et ses observations ne se chevauchent pas.
+Le vecteur v2 comprend 116 variables : les 34 variables d’origine, leurs interactions avec le sens du trade, les cycles horaires UTC et l’identité des 66 stratégies. Les plans, labels et coûts restent inchangés. Les anciens modèles à 34 variables restent compatibles.
+
+Cinq variantes fixes de logistique et LightGBM sont comparées sur une validation chronologique interne au développement, avec purge des labels et embargo de quatre heures. La variante choisie est réentraînée sur le développement complet. La calibration Platt utilise ensuite uniquement la partition de calibration ; celle-ci ne choisit plus le modèle. Les frontières du cœur sont reprises, avec purge des fins de labels et embargo de quatre heures. Le test final ne choisit pas le modèle et ses observations ne se chevauchent pas.
 
 Un modèle insuffisamment validé reste en **observation**. Seuls les modèles ayant 200 observations OOS sans chevauchement, 40 de chaque résultat, 30 estimations affichées strictement supérieures à 60 %, un Brier meilleur que la référence et une borne bootstrap à 95 % positive de l'espérance nette passent dans `models/published-*.json`. Les fixtures ne sont jamais publiées. Les expériences, variantes et oracles Python/JavaScript sont conservés.
 
@@ -91,3 +93,12 @@ Qlib 0.9.8 amont n'a pas de wheel PyPI disponible ici ; son build Windows demand
 ```
 
 Licences et versions figurent dans `THIRD-PARTY-NOTICES.md`, `dependency-manifest.json` et les lockfiles. Les sources du laboratoire peuvent être publiées ; les deux venv et `orivane-data` sont exclus du déploiement.
+
+## Reprendre un export causal existant
+
+```powershell
+node ../orivane-funded/src/upgrade-trade-features.mjs ../orivane-data/experiments/BTC_USD-trades.json ../orivane-data/experiments/BTC_USD-trades-v2.json
+./run-lab.ps1 -Mode train -InputFile ../orivane-data/experiments/BTC_USD-trades-v2.json
+```
+
+La migration utilise uniquement les variables originales, la stratégie et l’heure d’entrée connues à la clôture. Elle conserve les labels et partitions, écrit un nouveau fichier et enregistre le SHA256 parent. Les scores sur une période déjà évaluée sont des résultats de réévaluation historique ; ils ne constituent pas une nouvelle période indépendante.

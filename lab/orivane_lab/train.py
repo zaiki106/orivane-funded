@@ -12,6 +12,27 @@ POLICY = "trade-publication-v1"
 SCHEMA = "trade-tp-before-sl-v1"
 
 
+def selection_split(development, embargo_ms=16 * 15 * 60_000):
+    """Select hyperparameters inside development; leave calibration and test out."""
+    times = sorted({e["entryTimeMs"] for e in development})
+    if len(times) < 10:
+        raise ValueError("Insufficient development timestamps for selection")
+    boundary = times[int(len(times) * .75)]
+    fit = [e for e in development if e["labelEndTimeMs"] < boundary]
+    validation = nonoverlapping([e for e in development if e["entryTimeMs"] >= boundary + embargo_ms])
+    for title, rows in (("selection fit", fit), ("selection validation", validation)):
+        if len(rows) < 40 or len({e["y"] for e in rows}) != 2:
+            raise ValueError(f"Insufficient {title}; collect more history")
+    return fit, validation, boundary
+
+
+def restrict_reassessed_publication(report, metadata):
+    if metadata.get("testPreviouslyEvaluated"):
+        report.update(passed=False, status="observation", evaluationRole="historical-reassessment")
+        report["rejectionReasons"].append("fresh_holdout_required_after_reassessment")
+    return report
+
+
 def chronological_split(examples, embargo_ms=16 * 15 * 60_000, boundaries=None):
     """Partition on unique entry timestamps, never split same-time setups across folds."""
     examples = sorted((e for e in examples if e.get("y") in (0, 1) and not e.get("censored")), key=lambda e: (e["entryTimeMs"], e["id"]))
@@ -137,15 +158,42 @@ def _train(input_path: Path, root: Path = DEFAULT_ROOT):
             raise ValueError("Feature vector mismatch or nonfinite features")
         return x, np.asarray([e["y"] for e in partition], dtype=int)
 
+    fit_rows, validation_rows, selection_boundary = selection_split(development, max_bars * 15 * 60_000)
+    fit_x, fit_y = arrays(fit_rows)
+    validation_x, validation_y = arrays(validation_rows)
     train_x, train_y = arrays(development)
     cal_x, cal_y = arrays(calibration)
     test_x, test_y = arrays(test)
-    scaler = StandardScaler().fit(train_x)
-    logistic = LogisticRegression(C=1.0, max_iter=1000, random_state=42).fit(scaler.transform(train_x), train_y)
-    boosting = lgb.LGBMClassifier(n_estimators=120, max_depth=4, num_leaves=15, learning_rate=.04, min_child_samples=40,
-        reg_lambda=2, subsample=1, colsample_bytree=1, random_state=42, n_jobs=4, verbosity=-1).fit(train_x, train_y)
+    # Fixed, recorded search space. Never add variants in response to test scores.
+    variants = [
+        ("logistic-c01", "logistic", {"C": .1}),
+        ("logistic-c1", "logistic", {"C": 1.0}),
+        ("lightgbm-shallow", "lightgbm", {"n_estimators": 120, "max_depth": 4, "num_leaves": 15, "min_child_samples": 40}),
+        ("lightgbm-medium", "lightgbm", {"n_estimators": 250, "max_depth": 6, "num_leaves": 31, "min_child_samples": 80}),
+        ("lightgbm-regularized", "lightgbm", {"n_estimators": 350, "max_depth": 8, "num_leaves": 63, "min_child_samples": 150}),
+    ]
+    def fit_model(algorithm, parameters, x, y):
+        scaler = StandardScaler().fit(x)
+        if algorithm == "logistic":
+            model = LogisticRegression(**parameters, max_iter=2000, random_state=42).fit(scaler.transform(x), y)
+        else:
+            model = lgb.LGBMClassifier(**parameters, learning_rate=.04, reg_lambda=2, subsample=1,
+                colsample_bytree=1, random_state=42, n_jobs=4, verbosity=-1).fit(x, y)
+        return model, scaler
+
     candidates = []
-    for algorithm, model in (("logistic", logistic), ("lightgbm", boosting)):
+    for variant_id, algorithm, parameters in variants:
+        probe, probe_scaler = fit_model(algorithm, parameters, fit_x, fit_y)
+        validation_probability = probe.predict_proba(probe_scaler.transform(validation_x) if algorithm == "logistic" else validation_x)[:, 1]
+        selection_brier = float(np.mean((validation_probability - validation_y) ** 2))
+        candidates.append({"id": variant_id, "algorithm": algorithm, "parameters": parameters, "selectionBrier": selection_brier})
+    chosen = min(candidates, key=lambda row: (row["selectionBrier"], row["id"]))
+    selection_results = list(candidates)
+    candidates = []
+    # Fit and calibrate only the selected variant. Calibration never selects it.
+    for variant in (chosen,):
+        algorithm = variant["algorithm"]
+        model, scaler = fit_model(algorithm, variant["parameters"], train_x, train_y)
         def margin(x):
             return model.decision_function(scaler.transform(x)) if algorithm == "logistic" else model.predict(x, raw_score=True)
         cal_margin = margin(cal_x)
@@ -156,9 +204,9 @@ def _train(input_path: Path, root: Path = DEFAULT_ROOT):
         predictor = {"weights": model.coef_[0].tolist(), "intercept": float(model.intercept_[0]), "mean": scaler.mean_.tolist(),
             "scale": scaler.scale_.tolist()} if algorithm == "logistic" else {"modelDump": model.booster_.dump_model()}
         test_margin = margin(test_x)
-        candidates.append({"algorithm": algorithm, "predictor": predictor, "calibration": {"method": "platt", "a": a, "b": b},
+        candidates.append({"algorithm": algorithm, "variant": variant["id"], "predictor": predictor, "calibration": {"method": "platt", "a": a, "b": b},
             "calibrationBrier": brier, "testProbabilities": expit(a * test_margin + b), "testMargins": test_margin})
-    selected = min(candidates, key=lambda row: row["calibrationBrier"])
+    selected = candidates[0]
     if not math.isfinite(selected["calibrationBrier"]):
         raise ValueError("Nonfinite calibration; no publishable model")
     trained_through = max(e["labelEndTimeMs"] for e in calibration)
@@ -171,6 +219,7 @@ def _train(input_path: Path, root: Path = DEFAULT_ROOT):
         "algorithm": selected["algorithm"], "predictor": selected["predictor"], "calibration": selected["calibration"],
         "publication": publication_report(test, selected["testProbabilities"], float(train_y.mean()), context)}
     model["publicationReport"] = model["publication"]
+    restrict_reassessed_publication(model["publication"], metadata)
     synthetic = bool(metadata.get("synthetic") or "fixture" in source.lower())
     if synthetic:
         model["publication"].update(passed=False, status="observation")
@@ -179,8 +228,11 @@ def _train(input_path: Path, root: Path = DEFAULT_ROOT):
     model["id"] = identifier
     experiment = {"schemaVersion": 1, "id": identifier, "generatedAt": utc_now(), "inputSha256": hashlib.sha256(Path(input_path).read_bytes()).hexdigest(),
         "symbol": symbol, "source": source, "split": split, "censored": sum(bool(e.get("censored")) for e in examples),
-        "selection": "calibration_brier_only", "testUsedForSelection": False, "baseline": float(train_y.mean()),
-        "variants": [{**{k: row[k] for k in ("algorithm", "calibrationBrier", "calibration")}, "calibrationSign": "positive" if row["calibration"]["a"] > 0 else "negative"} for row in candidates],
+        "selection": "purged_development_validation_brier", "selectionBoundaryMs": selection_boundary,
+        "selectionCounts": [len(fit_rows), len(validation_rows)], "selectedVariant": selected["variant"],
+        "calibrationUsedForSelection": False, "testUsedForSelection": False, "baseline": float(train_y.mean()),
+        "variants": selection_results, "calibrationFitBrier": selected["calibrationBrier"],
+        "testProbabilityRange": [float(min(selected["testProbabilities"])), float(max(selected["testProbabilities"]))],
         "publicationReport": model["publicationReport"], "modelFile": f"models/{identifier}.json"}
     oracles = [{"model": {**{key: model[key] for key in ("schemaVersion", "kind", "symbol", "source", "featureNames", "trainedThrough",
             "trainedThroughMs", "outcomeVersion", "maxBars", "cost", "strategyMode", "h1Policy", "registryVersion", "entryPolicy", "maxEntryDelayMs")}, "algorithm": row["algorithm"], "predictor": row["predictor"],

@@ -7,7 +7,7 @@ if(!input||!output)throw Error('Usage: node src/export-trade-examples.mjs --inpu
 const parsed=JSON.parse(await readFile(input,'utf8')),datasets=Array.isArray(parsed)?parsed:Array.isArray(parsed.datasets)?parsed.datasets:[parsed],selected=symbol?datasets.filter(dataset=>dataset.symbol===symbol):datasets;
 if(!selected.length)throw Error('Instrument absent du fichier');
 for(let i=0;i<selected.length;i++){
- const result=collectTradeExamples(selected[i],{strategyMode:mode}),split=splitTradeExamples(result),target=selected.length===1?output:output.replace(/\.json$/i,'')+'-'+selected[i].symbol.replace(/[^a-z0-9]/gi,'_')+'.json';
+ const result=collectTradeExamples(selected[i],{strategyMode:mode,featureVersion:get('--features')??'v2'}),split=splitTradeExamples(result),target=selected.length===1?output:output.replace(/\.json$/i,'')+'-'+selected[i].symbol.replace(/[^a-z0-9]/gi,'_')+'.json';
  result.metadata.partitions={train:split.train.length,calibration:split.calibration.length,test:split.test.length,excluded:split.excluded};
  await mkdir(dirname(target),{recursive:true});await writeFile(target,JSON.stringify(result));
  process.stdout.write(JSON.stringify({symbol:selected[i].symbol,file:target,examples:result.examples.length,censored:result.metadata.censored,partitions:result.metadata.partitions})+'\n');

@@ -14,7 +14,26 @@ import pytest
 from orivane_lab.api import create_server
 from orivane_lab.archives import ConcatenatedReader
 from orivane_lab.storage import ProcessLock, initialize, read_json, require_capacity
-from orivane_lab.train import chronological_split, expectancy_interval, nonoverlapping, publication_report
+from orivane_lab.train import chronological_split, expectancy_interval, nonoverlapping, publication_report, selection_split, restrict_reassessed_publication
+
+
+def test_reassessed_holdout_cannot_promote_even_with_passing_metrics():
+    report = {"passed": True, "status": "paper", "rejectionReasons": []}
+    restrict_reassessed_publication(report, {"testPreviouslyEvaluated": True})
+    assert report["passed"] is False
+    assert report["status"] == "observation"
+    assert report["rejectionReasons"] == ["fresh_holdout_required_after_reassessment"]
+
+
+def test_model_selection_is_inside_development_with_purge_and_embargo():
+    rows = [{"id": str(i), "entryTimeMs": i * 900000, "labelEndTimeMs": (i + 2) * 900000, "y": i % 2} for i in range(900)]
+    fit, validation, boundary = selection_split(rows)
+    assert max(e["labelEndTimeMs"] for e in fit) < boundary
+    assert min(e["entryTimeMs"] for e in validation) >= boundary + 16 * 900000
+    assert all(b["entryTimeMs"] > a["labelEndTimeMs"] for a, b in zip(validation, validation[1:]))
+    # Outcomes after the boundary cannot change the fitting partition.
+    changed = [{**e, "y": 1-e["y"]} if e["entryTimeMs"] >= boundary else e for e in rows]
+    assert selection_split(changed)[0] == fit
 
 
 def test_multipart_zip_crosses_boundaries_without_join(tmp_path):

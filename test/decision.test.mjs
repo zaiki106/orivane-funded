@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {routeStrategy,calibrateDecision,decide,aggregateH1,higherTimeframe,labelOutcome,classificationSamples,predictMarketClass,classes,featureNames,decisionVersion} from '../src/decision.mjs';
-import {signal,strategies} from '../src/engine.mjs';
+import {signal,strategies,indicators} from '../src/engine.mjs';
 import {fitRegularizedQDA} from '../src/regularized-qda.mjs';
 import {fitNeuralNetwork,predictNeuralNetwork} from '../src/neural-network.mjs';
 import {fitRegularizedLDA,predictRegularizedLDA} from '../src/regularized-lda.mjs';
@@ -76,14 +76,13 @@ test('BUY and SELL percentages use their respective market class and never the c
   for(const [bars,side,percent,marketClass,probabilities] of [[buy,'BUY',80,'UP',[.8,.1,.1]],[sell,'SELL',75,'DOWN',[.1,.75,.15]]]){const d=decide(bars,fixedProbabilityModel(probabilities));assert.equal(d.side,side);assert.equal(d.score,100);assert.equal(d.confidence.percent,percent);assert.equal(d.confidence.class,marketClass);}
 });
 
-test('routing does not fall back to another active strategy or consult votes',()=>{
-  let example=null;
-  for(let i=60;i<dataset.bars.length;i++){
-    const bars=dataset.bars.slice(0,i+1),route=routeStrategy(bars);
-    if(signal(bars,route.strategy).side==='HOLD'&&strategies.some(s=>s.id!==route.strategy&&signal(bars,s.id).side!=='HOLD')){example=bars;break;}
+test('routing retains one completed rule without consulting votes or manufacturing confidence',()=>{
+  for(let i=60;i<dataset.bars.length;i+=7){
+    const bars=dataset.bars.slice(0,i+1),q=indicators(bars.slice(-160)),route=routeStrategy(bars);
+    const active=strategies.filter(s=>signal([],s.id,q).side!=='HOLD');
+    if(active.length)assert.notEqual(signal([],route.strategy,q).side,'HOLD');
+    const d=decide(bars);assert.equal(d.side,'HOLD');assert.equal(d.strategy,route.strategy);assert.equal(d.confidence.percent,null);assert.ok(!('votes' in d));
   }
-  assert.ok(example,'fixture must contain a routed HOLD despite another active rule');
-  const d=decide(example);assert.equal(d.side,'HOLD');assert.equal(d.strategy,routeStrategy(example).strategy);assert.equal(d.confidence.percent,null);
 });
 
 test('H1 bars require four real consecutive aligned closed candles',()=>{

@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orivane-lab"
+version = "1.0.0"
+description = "Private research, official market data, causal trade probability models"
+requires-python = ">=3.12"
+
+[tool.setuptools.packages.find]
+include = ["orivane_lab*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

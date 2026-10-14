@@ -14,6 +14,7 @@ test('cloud protects HTML, state, export and streaming while health exposes only
   try{
     for(const url of ['/','/api/state','/api/export','/api/stream']){const r=await request(url);assert.equal(r.status,401);assert.match(r.headers['www-authenticate'],/Basic/);assert.doesNotMatch(r.body,/token|positions/);}
     assert.equal((await request('/healthz')).body,'ok');
+    assert.equal((await request('/healthz',{host:'127.0.0.1'})).body,'ok');
     assert.equal((await request('/api/state',{authorization:'Basic '+Buffer.from('orivane:wrong').toString('base64')})).status,401);
     for(const headers of [{host:'evil.example'},{origin:'https://evil.example'},{'sec-fetch-site':'cross-site'}])assert.equal((await request('/api/state',{authorization,...headers})).status,403);
     const state=await request('/api/state',{authorization,origin:'https://terminal.example'});assert.equal(state.status,200);assert.equal(JSON.parse(state.body).radar.length,5);

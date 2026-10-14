@@ -1,9 +1,12 @@
+import {fitBoostedStumps,predictBoostedStumps,validBoostedModel,boostingAlgorithm} from './boosted-stumps.mjs';
+import {expansionStrategies,expansionChecks} from './expansion-strategies.mjs';
+import {adjustClassProbabilities,fitClassCalibration} from './class-calibration.mjs';
 import {advancedStrategies,advancedChecks} from './advanced-strategies.mjs';
 import {auditProbabilityRows} from './probability-audit.mjs';
 import {fitRegularizedLDA,predictRegularizedLDA,validLinearDiscriminant,ldaAlgorithm} from './regularized-lda.mjs';
 import {pricePatternChecks} from './price-patterns.mjs';
 import {executionPlan} from './execution-plan.mjs';
-import {indicators,signal,analysisWindow} from './engine.mjs';
+import {indicators,signal,strategies,analysisWindow} from './engine.mjs';
 import {costForSymbol,directionalCostFraction,validTradingCost} from './cost-policy.mjs';
 import {fitNearestNeighbors,predictNearestNeighbors,validNeighborModel,neighborAlgorithm} from './nearest-neighbors.mjs';
 import {fitRegularizedQDA,predictRegularizedQDA,validDiscriminantModel,qdaAlgorithm} from './regularized-qda.mjs';
@@ -51,7 +54,7 @@ export function higherTimeframe(bars){
 function routeFrom(q,h1,router){
   const make=(strategy,regime,why,setupPresent=true)=>({strategy,regime,why,setupPresent,higherTimeframe:h1,version,policy:'regime-structure-v5'});
   if(!q||q.atr<=0)return make('pullback','Unavailable','Historique ou volatilité insuffisants');
-  const advancedRoute=()=>{for(const rule of advancedStrategies){const checks=advancedChecks(q,rule.id);if(checks.BUY.every(c=>c.passed)||checks.SELL.every(c=>c.passed))return make(rule.id,'Advanced structure',rule.description);}return null;};
+  const advancedRoute=()=>{for(const rule of advancedStrategies){const checks=advancedChecks(q,rule.id);if(checks.BUY.every(c=>c.passed)||checks.SELL.every(c=>c.passed))return make(rule.id,'Advanced structure',rule.description);}for(const rule of expansionStrategies){const checks=expansionChecks(q,rule.id);if(checks.BUY.every(c=>c.passed)||checks.SELL.every(c=>c.passed))return make(rule.id,'Extended structure',rule.description);}return null;};
   const x=q.last,p=q.previous,compression=q.previousBand.width>0&&q.previousBand.width<=q.squeezeThreshold*.9,body=Math.abs(x.close-x.open),bull=x.close>x.open,bear=x.close<x.open,volumeOK=!q.hasVolume||q.volumeRatio>=1.2,expanded=x.high-x.low>q.atr*.8;
   // Fixed regime + observable structure precedence, before evaluating ONE rule.
   // Compression without a break is a context, not a completed squeeze setup.
@@ -110,7 +113,16 @@ function routeFrom(q,h1,router){
 export function routeStrategy(bars,router=defaultRouter){
   const b=closed(bars),asOf=Date.parse(b.at(-1)?.time)+900000;
   const fitted=router?.fittedThrough&&Date.parse(router.fittedThrough)>asOf?defaultRouter:{...defaultRouter,...router};
-  return routeFrom(indicators(b.slice(-featureWindow)),higherTimeframe(b),fitted);
+  const q=indicators(b.slice(-featureWindow)),route=routeFrom(q,higherTimeframe(b),fitted);
+  if(!q||signal([],route.strategy,q).side!=='HOLD')return route;
+  // The regime preference must not mask a completed technical rule. Keep a fixed
+  // catalog precedence and select exactly one rule; probabilities never rank rules.
+  for(const rule of strategies){
+    if(rule.id===route.strategy)continue;
+    if(signal([],rule.id,q).side!=='HOLD')return {...route,strategy:rule.id,regime:'Completed structure',setupPresent:true,
+      why:rule.description,preferredStrategy:route.strategy,policy:'regime-structure-v6'};
+  }
+  return route;
 }
 
 function featurePoint(bars,index){
@@ -157,13 +169,15 @@ function standardizer(rows){
 function transform(features,scaler){return [1,...features.map((x,j)=>clip((x-scaler.mean[j])/scaler.scale[j],-5,5))];}
 function softmax(logits,temperature=1){const scaled=logits.map(x=>x/temperature),largest=Math.max(...scaled),values=scaled.map(x=>Math.exp(x-largest)),total=values.reduce((sum,x)=>sum+x,0);return values.map(x=>x/total);}
 function neighborPrediction(features,model,excludeIndex=null){return predictNearestNeighbors(features,{...model.neighbors,k:model.neighborCount??model.neighbors?.k},model.scaler,{excludeIndex});}
-function probabilities(features,model,temperature=model.temperature??1,excludeIndex=null){
+function rawProbabilities(features,model,temperature=model.temperature??1,excludeIndex=null){
+  if(model.algorithm===boostingAlgorithm)return predictBoostedStumps(features,model.boosted,model.scaler,{temperature});
   if(model.algorithm===neighborAlgorithm)return neighborPrediction(features,model,excludeIndex)?.probabilities??null;
   if(model.algorithm===ldaAlgorithm)return predictRegularizedLDA(features,model.linearDiscriminant,model.scaler,{temperature});
   if(model.algorithm===qdaAlgorithm)return predictRegularizedQDA(features,model.discriminant,model.scaler,{temperature});
   if(model.algorithm===neuralAlgorithm)return predictNeuralNetwork(features,model.neural,model.scaler,{temperature});
   const x=transform(features,model.scaler);return softmax(model.weights.map(row=>row.reduce((sum,weight,j)=>sum+weight*x[j],0)),temperature);
 }
+function probabilities(features,model,temperature=model.temperature??1,excludeIndex=null){return adjustClassProbabilities(rawProbabilities(features,model,temperature,excludeIndex),model.classCalibration);}
 const counts=rows=>Object.fromEntries(classes.map(label=>[label,rows.filter(row=>row.label===label).length]));
 
 function fitLogistic(rows,scaler,config){
@@ -179,15 +193,17 @@ function fitLogistic(rows,scaler,config){
 
 function diagnostics(rows,model,temperature=model.temperature??1,{excludeTrainingSelf=false}={}){
   const n=rows.length,prior=model.classPrior??[1/3,1/3,1/3],reliability=Object.fromEntries(classes.map(label=>[label,Array.from({length:10},(_,i)=>({lower:i/10,upper:(i+1)/10,n:0,probabilitySum:0,positive:0}))]));
+  const directional=Object.fromEntries(classes.map(label=>[label,{sample:n,positive:0,brier:0,baselineBrier:0}]));
   let brier=0,logLoss=0,baseBrier=0,baseLogLoss=0,correct=0;
   for(const row of rows){const p=probabilities(row.features,model,temperature,excludeTrainingSelf?row.index:null),actual=classes.indexOf(row.label);if(p.indexOf(Math.max(...p))===actual)correct++;
-    for(let k=0;k<3;k++){const y=k===actual?1:0;brier+=(p[k]-y)**2;baseBrier+=(prior[k]-y)**2;const bin=reliability[classes[k]][Math.min(9,Math.floor(p[k]*10))];bin.n++;bin.probabilitySum+=p[k];bin.positive+=y;}
+    for(let k=0;k<3;k++){const y=k===actual?1:0;const event=directional[classes[k]];event.positive+=y;event.brier+=(p[k]-y)**2;event.baselineBrier+=(prior[k]-y)**2;brier+=(p[k]-y)**2;baseBrier+=(prior[k]-y)**2;const bin=reliability[classes[k]][Math.min(9,Math.floor(p[k]*10))];bin.n++;bin.probabilitySum+=p[k];bin.positive+=y;}
     logLoss-=Math.log(Math.max(p[actual],1e-15));baseLogLoss-=Math.log(Math.max(prior[actual],1e-15));
   }
+  for(const event of Object.values(directional)){event.brier=n?event.brier/n:null;event.baselineBrier=n?event.baselineBrier/n:null;}
   let calibrationError=0;
   for(const label of classes)reliability[label]=reliability[label].map(({probabilitySum,positive,...bin})=>{const meanProbability=bin.n?probabilitySum/bin.n:null,observedFrequency=bin.n?positive/bin.n:null;if(bin.n)calibrationError+=bin.n*Math.abs(meanProbability-observedFrequency);return {...bin,meanProbability,observedFrequency};});
   let sampleWithoutOverlap=0,lastEnd=-1;for(const row of rows)if(row.index>=lastEnd){sampleWithoutOverlap++;lastEnd=row.labelEndIndex;}
-  return {sample:n,sampleWithoutOverlap,classSamples:counts(rows),brier:n?brier/n:null,logLoss:n?logLoss/n:null,baselineBrier:n?baseBrier/n:null,baselineLogLoss:n?baseLogLoss/n:null,brierSkill:n&&baseBrier>0?1-brier/baseBrier:null,accuracy:n?correct/n:null,calibrationError:n?calibrationError/(3*n):null,reliability,overlappingTargets:true};
+  return {sample:n,sampleWithoutOverlap,directional,classSamples:counts(rows),brier:n?brier/n:null,logLoss:n?logLoss/n:null,baselineBrier:n?baseBrier/n:null,baselineLogLoss:n?baseLogLoss/n:null,brierSkill:n&&baseBrier>0?1-brier/baseBrier:null,accuracy:n?correct/n:null,calibrationError:n?calibrationError/(3*n):null,reliability,overlappingTargets:true};
 }
 
 export function calibrateDecision(dataset,options={}){
@@ -210,6 +226,9 @@ export function calibrateDecision(dataset,options={}){
   for(let i=0;i<=40;i++){const temperature=Math.exp(Math.log(.25)+i*Math.log(16)/40),loss=diagnostics(calibration,model,temperature).logLoss;if(loss<bestLoss){bestLoss=loss;bestTemperature=temperature;}}
   model.temperature=bestTemperature;model.logisticTemperature=bestTemperature;
   const logisticCalibration=diagnostics(calibration,model),candidates=[{algorithm:model.algorithm,k:null,shrinkage:null,hiddenUnits:null,temperature:bestTemperature,brier:logisticCalibration.brier,logLoss:logisticCalibration.logLoss,sample:calibration.length}];
+  const directionalPool=[];
+  const retain=(candidateModel,report,temperature=candidateModel.temperature)=>{if(options.directionalExperts===true)directionalPool.push({model:{...candidateModel,temperature,classCalibration:null},report});};
+  retain(model,logisticCalibration);
   model.neighbors=fitNearestNeighbors(train,model.scaler,{k:31});
   let selected=candidates[0],selectedCalibration=logisticCalibration;
   if(model.neighbors){
@@ -217,6 +236,7 @@ export function calibrateDecision(dataset,options={}){
       if(train.length<=k)continue;
       const candidateModel={...model,algorithm:neighborAlgorithm,neighborCount:k,temperature:1},report=diagnostics(calibration,candidateModel),candidate={algorithm:neighborAlgorithm,k,shrinkage:null,hiddenUnits:null,temperature:1,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
       candidates.push(candidate);
+      retain(candidateModel,report,1);
       // Ties retain the simpler logistic model or the earlier smaller k.
       if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
     }
@@ -234,6 +254,7 @@ export function calibrateDecision(dataset,options={}){
     }
     const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:qdaAlgorithm,k:null,shrinkage,hiddenUnits:null,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
     candidates.push(candidate);
+    retain(candidateModel,report,temperature);
     if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;model.discriminant=discriminant;}
   }
   for(const hiddenUnits of [8,16]){
@@ -249,6 +270,7 @@ export function calibrateDecision(dataset,options={}){
     }
     const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:neuralAlgorithm,k:null,shrinkage:null,hiddenUnits,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
     candidates.push(candidate);
+    retain(candidateModel,report,temperature);
     if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;model.neural=neural;}
   }
   let bestLdaBrier=Infinity;
@@ -258,17 +280,52 @@ export function calibrateDecision(dataset,options={}){
     let temperature=1,loss=diagnostics(calibration,candidateModel,1).logLoss;
     for(let i=0;i<=40;i++){const next=Math.exp(Math.log(.25)+i*Math.log(16)/40),nextLoss=diagnostics(calibration,candidateModel,next).logLoss;if(nextLoss<loss){loss=nextLoss;temperature=next;}}
     const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:ldaAlgorithm,k:null,shrinkage,hiddenUnits:null,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
-    candidates.push(candidate);if(candidate.brier<bestLdaBrier){model.linearDiscriminant=linearDiscriminant;bestLdaBrier=candidate.brier;}
+    candidates.push(candidate);retain(candidateModel,report,temperature);if(candidate.brier<bestLdaBrier){model.linearDiscriminant=linearDiscriminant;bestLdaBrier=candidate.brier;}
     if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
+  }
+  if(options.boosting===true){
+    model.boosted=fitBoostedStumps(train,model.scaler);
+    if(model.boosted){const candidateModel={...model,algorithm:boostingAlgorithm,temperature:1};
+      let temperature=1,loss=diagnostics(calibration,candidateModel,1).logLoss;
+      for(let i=0;i<=40;i++){const next=Math.exp(Math.log(.25)+i*Math.log(16)/40),nextLoss=diagnostics(calibration,candidateModel,next).logLoss;if(nextLoss<loss){loss=nextLoss;temperature=next;}}
+      const report=diagnostics(calibration,candidateModel,temperature),candidate={algorithm:boostingAlgorithm,k:null,shrinkage:null,hiddenUnits:null,rounds:model.boosted.rounds,temperature,brier:report.brier,logLoss:report.logLoss,sample:calibration.length};
+      candidates.push(candidate);retain(candidateModel,report,temperature);if(candidate.brier<selected.brier){selected=candidate;selectedCalibration=report;}
+    }
   }
   model.algorithm=selected.algorithm;model.neighborCount=selected.k;model.temperature=selected.temperature;
   model.selection={metric:'brier',partition:'calibration',selected:selected.algorithm,selectedK:selected.k,selectedShrinkage:selected.shrinkage,selectedHiddenUnits:selected.hiddenUnits,trainingRefit:false,holdoutUsed:false,candidates};
+  if(options.classCalibration===true){
+    const fitted=fitClassCalibration(calibration.map(row=>({probabilities:rawProbabilities(row.features,model),actual:classes.indexOf(row.label)})));
+    if(fitted){
+      const adjusted=diagnostics(calibration,{...model,classCalibration:fitted});
+      model.calibrationAdjustment={method:fitted.method,partition:'calibration',holdoutUsed:false,baseBrier:selectedCalibration.brier,adjustedBrier:adjusted.brier,applied:adjusted.brier<selectedCalibration.brier};
+      if(model.calibrationAdjustment.applied){model.classCalibration=fitted;selectedCalibration=adjusted;}
+    }
+  }
   model.training=diagnostics(train,model,1,{excludeTrainingSelf:model.algorithm===neighborAlgorithm});model.training.predictionMode=model.algorithm===neighborAlgorithm?'leave-one-out':'resubstitution';
   model.calibration=selectedCalibration;model.test=diagnostics(test,model);
   model.test.robustness=auditProbabilityRows(test.map(row=>({...row,probabilities:probabilities(row.features,model)})),model.classPrior);
   model.training.labelCoverage=train.length/Math.max(1,trainEnd-gap-59);model.calibration.labelCoverage=calibration.length/Math.max(1,calibrationEnd-trainEnd-2*gap);model.test.labelCoverage=test.length/Math.max(1,n-calibrationEnd-2*gap);
   model.status='estimate';model.reason='Un seul classifieur sélectionné sur validation ; diagnostic final séparé des paramètres';model.calibrated=model.algorithm!==neighborAlgorithm;model.calibrationMethod=model.calibrated?'temperature-scaling':'neighbor-count-validation';model.audited=test.length>=config.minTestSamples;
+  if(options.directionalExperts===true){
+    model.directionalExperts={};
+    model.expertSelection={enabled:true,metric:'one-vs-rest-brier',partition:'calibration',holdoutUsed:false,trainingRefit:false,candidates:directionalPool.map(c=>({algorithm:c.model.algorithm,k:c.model.neighborCount??null,temperature:c.model.temperature,UP:c.report.directional.UP.brier,DOWN:c.report.directional.DOWN.brier}))};
+    for(const direction of ['UP','DOWN']){
+      // No averaging or voting: exactly one full classifier supplies the event.
+      const best=directionalPool.reduce((winner,c)=>c.report.directional[direction].brier<winner.report.directional[direction].brier?c:winner),expert={...best.model,status:'estimate',calibrated:best.model.algorithm!==neighborAlgorithm,audited:model.audited,selection:{metric:'one-vs-rest-brier',class:direction,partition:'calibration',holdoutUsed:false,trainingRefit:false},classCalibration:null};
+      let report=best.report;
+      if(options.classCalibration===true){const fitted=fitClassCalibration(calibration.map(row=>({probabilities:rawProbabilities(row.features,expert),actual:classes.indexOf(row.label)})));if(fitted){const adjusted=diagnostics(calibration,{...expert,classCalibration:fitted});if(adjusted.directional[direction].brier<report.directional[direction].brier){expert.classCalibration=fitted;expert.calibrated=true;report=adjusted;}}}
+      expert.calibration=report;expert.test=diagnostics(test,expert);expert.training=diagnostics(train,expert,1,{excludeTrainingSelf:expert.algorithm===neighborAlgorithm});
+      model.directionalExperts[direction]=expert;
+    }
+  }
   return model;
+}
+
+export function modelForDirection(model,direction){
+  if(!model?.expertSelection?.enabled||!['UP','DOWN'].includes(direction))return model;
+  const expert=model.directionalExperts?.[direction];
+  return expert?.version===model.version&&expert.symbol===model.symbol&&expert.source===model.source&&expert.calibratedThrough===model.calibratedThrough&&expert.selection?.class===direction?expert:null;
 }
 
 export function predictMarketClass(bars,model){
@@ -277,12 +334,14 @@ export function predictMarketClass(bars,model){
   if(!Array.isArray(model.classes)||model.classes.join(',')!==classes.join(',')||!Number.isFinite(Date.parse(model.calibratedThrough)))return null;
   if(!Array.isArray(model.weights)||model.weights.length!==3||model.weights.some(row=>!Array.isArray(row)||row.length!==featureNames.length+1||row.some(x=>!Number.isFinite(x))))return null;
   if(!Array.isArray(model.scaler?.mean)||model.scaler.mean.length!==featureNames.length||model.scaler.mean.some(x=>!Number.isFinite(x))||!Array.isArray(model.scaler.scale)||model.scaler.scale.length!==featureNames.length||model.scaler.scale.some(x=>!Number.isFinite(x)||x<=0))return null;
-  if(model.algorithm!==undefined&&!['multinomial-logistic',neighborAlgorithm,qdaAlgorithm,neuralAlgorithm,ldaAlgorithm].includes(model.algorithm))return null;
+  if(model.algorithm!==undefined&&!['multinomial-logistic',neighborAlgorithm,qdaAlgorithm,neuralAlgorithm,ldaAlgorithm,boostingAlgorithm].includes(model.algorithm))return null;
   if(model.algorithm===neighborAlgorithm&&!validNeighborModel({...model.neighbors,k:model.neighborCount??model.neighbors?.k},featureNames.length))return null;
   if(model.algorithm===qdaAlgorithm&&!validDiscriminantModel(model.discriminant,featureNames.length))return null;
   if(model.algorithm===ldaAlgorithm&&!validLinearDiscriminant(model.linearDiscriminant,featureNames.length))return null;
+  if(model.algorithm===boostingAlgorithm&&!validBoostedModel(model.boosted,featureNames.length))return null;
   if(model.algorithm===neuralAlgorithm&&!validNeuralModel(model.neural,featureNames.length))return null;
   if(Date.parse(model.calibratedThrough)>asOf)return null;
+  if(model.classCalibration&&!adjustClassProbabilities([1/3,1/3,1/3],model.classCalibration))return null;
   const p=probabilities(point.features,model);if(!Array.isArray(p)||p.length!==3||p.some(value=>!Number.isFinite(value)||value<0||value>1)||Math.abs(p.reduce((a,b)=>a+b,0)-1)>1e-9)return null;
   return Object.fromEntries(classes.map((label,i)=>[label,p[i]]));
 }
@@ -290,7 +349,7 @@ export function predictMarketClass(bars,model){
 export function decide(bars,model=null,options={}){
   const b=closed(bars),route=routeStrategy(b,model?.version===version?model.router:null),raw=signal(b.slice(-featureWindow),route.strategy),h1=route.higherTimeframe,stale=options.fresh===false;
   const opposed=h1.available&&(raw.side==='BUY'&&h1.direction==='DOWN'||raw.side==='SELL'&&h1.direction==='UP');
-  const classProbs=stale?null:predictMarketClass(b,model),candidateSide=['BUY','SELL'].includes(raw.side)?raw.side:null,candidateClass=candidateSide==='BUY'?'UP':candidateSide==='SELL'?'DOWN':null;
+  const candidateSide=['BUY','SELL'].includes(raw.side)?raw.side:null,candidateClass=candidateSide==='BUY'?'UP':candidateSide==='SELL'?'DOWN':null,eventModel=modelForDirection(model,candidateClass),classProbs=stale?null:predictMarketClass(b,eventModel);
   const plan=candidateSide?executionPlan(raw,options.quote??null,options.cost??model?.cost??costForSymbol(options.symbol??model?.symbol)):null;
   const invalidStructuralPlan=plan?.invalidStructure??false,filteredByLevels=plan?.filteredByLevels??false,filteredByPrice=plan?.filteredByPrice??false,filteredByCosts=plan?.filteredByCosts??false;
   // Compare the published tenth-percent value, so BUY/SELL can never display 60.0%.
@@ -306,8 +365,8 @@ export function decide(bars,model=null,options={}){
     referenceTime=Number.isFinite(referenceMs)?new Date(referenceMs).toISOString():null,
     referencePrice=Number.isFinite(b.at(-1)?.close)?b.at(-1).close:null,
     horizonEndAt=Number.isFinite(referenceMs)&&Number.isFinite(horizonMinutes)?new Date(referenceMs+horizonMinutes*60000).toISOString():null;
-  const neighborDetail=classProbs&&model.algorithm===neighborAlgorithm?neighborPrediction(featurePoint(b,b.length-1).features,model):null;
-  const confidence={percent:classProbs?Math.round(classProbs[selectedClass]*1000)/10:null,kind:'market_class_probability',event:model?.event?.description??'Direction nette à 60 min',horizonBars:model?.event?.horizonBars??4,horizonMinutes,referenceTime,referencePrice,horizonEndAt,cost:model?.cost??null,class:selectedClass,classProbs,algorithm:classProbs?(model.algorithm??'multinomial-logistic'):null,neighboursCount:neighborDetail?.neighborsCount??0,neighboursEffectiveSample:neighborDetail?.effectiveNeighbors??null,neighboursDetail:neighborDetail?.detail??[],sample:model?.trainingRange?.sample??0,calibrationSample:model?.calibrationRange?.sample??0,testSample:model?.testRange?.sample??0,classSamples:model?.trainingRange?.classSamples??null,calibrated:Boolean(classProbs&&model?.calibrated),audited:Boolean(classProbs&&model?.audited),status:stale?'stale':classProbs?'estimate':'insufficient',reason:stale?reason:classProbs?'Probabilité du mouvement net à 1 h ; distincte du taux de trades gagnants':futureModel?'Modèle postérieur à cette bougie':model?.reason??'Modèle historique en préparation',trainingRange:model?.trainingRange??null};
+  const neighborDetail=classProbs&&eventModel.algorithm===neighborAlgorithm?neighborPrediction(featurePoint(b,b.length-1).features,eventModel):null;
+  const confidence={percent:classProbs?Math.round(classProbs[selectedClass]*1000)/10:null,kind:'market_class_probability',event:model?.event?.description??'Direction nette à 60 min',horizonBars:model?.event?.horizonBars??4,horizonMinutes,referenceTime,referencePrice,horizonEndAt,cost:model?.cost??null,class:selectedClass,classProbs,algorithm:classProbs?(eventModel.algorithm??'multinomial-logistic'):null,neighboursCount:neighborDetail?.neighborsCount??0,neighboursEffectiveSample:neighborDetail?.effectiveNeighbors??null,neighboursDetail:neighborDetail?.detail??[],sample:model?.trainingRange?.sample??0,calibrationSample:model?.calibrationRange?.sample??0,testSample:model?.testRange?.sample??0,classSamples:model?.trainingRange?.classSamples??null,calibrated:Boolean(classProbs&&eventModel?.calibrated),audited:Boolean(classProbs&&eventModel?.audited),status:stale?'stale':classProbs?'estimate':'insufficient',reason:stale?reason:classProbs?'Probabilité du mouvement net à 1 h ; distincte du taux de trades gagnants':futureModel?'Modèle postérieur à cette bougie':model?.reason??'Modèle historique en préparation',trainingRange:model?.trainingRange??null};
   return {...raw,side,reason,riskDistance:side==='HOLD'?raw.riskDistance:plan.riskDistance,entry:side==='HOLD'?null:plan.entry,stop:side==='HOLD'?null:raw.stop,target:side==='HOLD'?null:raw.target,
     invalidation:invalidStructuralPlan?null:raw.invalidation,
     setup:raw.setup?{...raw.setup,confirmed:side!=='HOLD',entry:side==='HOLD'?null:plan.entry,...(invalidStructuralPlan?{stop:null,target:null,invalidation:null}:{})}:undefined,

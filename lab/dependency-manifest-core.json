@@ -1,0 +1,1624 @@
+{
+  "schemaVersion": 1,
+  "environment": "core",
+  "python": "3.12.14",
+  "platform": "Windows",
+  "architecture": "AMD64",
+  "generatedAt": "2026-10-14T00:32:18.235523+00:00",
+  "packages": [
+    {
+      "name": "bokeh",
+      "version": "3.9.2",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "homepage, https://bokeh.org",
+        "documentation, https://docs.bokeh.org",
+        "repository, https://github.com/bokeh/bokeh"
+      ],
+      "direct": false,
+      "requirements": [
+        "Jinja2>=2.9",
+        "contourpy>=1.2",
+        "narwhals>=1.13",
+        "numpy>=1.16",
+        "packaging>=16.8",
+        "pillow>=7.1.0",
+        "PyYAML>=3.10",
+        "tornado>=6.2; sys_platform != \"emscripten\"",
+        "xyzservices>=2021.09.1"
+      ]
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "licenseMetadata": "MPL-2.0",
+      "projectUrls": [
+        "Source, https://github.com/certifi/python-certifi"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Changelog, https://github.com/jawah/charset_normalizer/blob/master/CHANGELOG.md",
+        "Documentation, https://charset-normalizer.readthedocs.io/",
+        "Code, https://github.com/jawah/charset_normalizer",
+        "Issue tracker, https://github.com/jawah/charset_normalizer/issues"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "click",
+      "version": "8.5.0",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Changes, https://click.palletsprojects.com/page/changes/",
+        "Chat, https://discord.gg/pallets",
+        "Documentation, https://click.palletsprojects.com/",
+        "Donate, https://palletsprojects.com/donate",
+        "Source, https://github.com/pallets/click/"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "cloudpickle",
+      "version": "3.1.2",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Homepage, https://github.com/tartley/colorama"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "colorcet",
+      "version": "3.2.1",
+      "licenseMetadata": "CC-BY-4.0",
+      "projectUrls": [
+        "Issue Tracker, https://github.com/holoviz/colorcet/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen",
+        "Blog, https://blog.holoviz.org/",
+        "Discord, https://discord.gg/AXRHnJU6sP",
+        "Discourse, https://discourse.holoviz.org",
+        "Documentation, https://colorcet.holoviz.org",
+        "Funding, https://opencollective.com/holoviz",
+        "HoloViz, https://holoviz.org/",
+        "Homepage, https://colorcet.holoviz.org",
+        "Repository, https://github.com/holoviz/colorcet"
+      ],
+      "direct": false,
+      "requirements": [
+        "pre-commit; extra == \"tests\"",
+        "pytest>=2.8.5; extra == \"tests\"",
+        "pytest-cov; extra == \"tests\"",
+        "packaging; extra == \"tests\"",
+        "colorcet[tests]; extra == \"tests-extra\"",
+        "pytest-mpl; extra == \"tests-extra\"",
+        "numpy; extra == \"examples\"",
+        "holoviews; extra == \"examples\"",
+        "matplotlib; extra == \"examples\"",
+        "bokeh; extra == \"examples\"",
+        "colorcet[examples]; extra == \"tests-examples\"",
+        "nbval; extra == \"tests-examples\"",
+        "colorcet[examples]; extra == \"doc\"",
+        "nbsite>=0.8.4; extra == \"doc\"",
+        "sphinx-copybutton; extra == \"doc\"",
+        "colorcet[tests]; extra == \"all\"",
+        "colorcet[tests_extra]; extra == \"all\"",
+        "colorcet[examples]; extra == \"all\"",
+        "colorcet[doc]; extra == \"all\""
+      ]
+    },
+    {
+      "name": "contourpy",
+      "version": "1.4.0",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Homepage, https://github.com/contourpy/contourpy",
+        "Changelog, https://contourpy.readthedocs.io/en/latest/changelog.html",
+        "Documentation, https://contourpy.readthedocs.io",
+        "Repository, https://github.com/contourpy/contourpy"
+      ],
+      "direct": false,
+      "requirements": [
+        "numpy>=2.0",
+        "myst-parser; extra == \"docs\"",
+        "sphinx; extra == \"docs\"",
+        "sphinx-book-theme; extra == \"docs\"",
+        "sphinx-copybutton; extra == \"docs\"",
+        "bokeh; extra == \"bokeh\"",
+        "selenium; extra == \"bokeh\"",
+        "contourpy[bokeh,docs]; extra == \"mypy\"",
+        "bokeh; extra == \"mypy\"",
+        "docutils-stubs; extra == \"mypy\"",
+        "mypy==2.1.0; extra == \"mypy\"",
+        "types-Pillow; extra == \"mypy\"",
+        "contourpy[test-no-images]; extra == \"test\"",
+        "matplotlib; extra == \"test\"",
+        "pre-commit; extra == \"test\"",
+        "Pillow; extra == \"test\"",
+        "pytest; extra == \"test-no-images\"",
+        "pytest-cov; extra == \"test-no-images\"",
+        "pytest-rerunfailures<16; extra == \"test-no-images\"",
+        "pytest-xdist; extra == \"test-no-images\"",
+        "wurlitzer; extra == \"test-no-images\""
+      ]
+    },
+    {
+      "name": "cycler",
+      "version": "0.12.1",
+      "licenseMetadata": "Copyright (c) 2015, matplotlib project",
+      "projectUrls": [
+        "homepage, https://matplotlib.org/cycler/",
+        "repository, https://github.com/matplotlib/cycler"
+      ],
+      "direct": false,
+      "requirements": [
+        "ipython ; extra == 'docs'",
+        "matplotlib ; extra == 'docs'",
+        "numpydoc ; extra == 'docs'",
+        "sphinx ; extra == 'docs'",
+        "pytest ; extra == 'tests'",
+        "pytest-cov ; extra == 'tests'",
+        "pytest-xdist ; extra == 'tests'"
+      ]
+    },
+    {
+      "name": "duckdb",
+      "version": "1.5.6",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Documentation, https://duckdb.org/docs/stable/clients/python/overview",
+        "Source, https://github.com/duckdb/duckdb-python",
+        "Issues, https://github.com/duckdb/duckdb-python/issues",
+        "Changelog, https://github.com/duckdb/duckdb-python/releases"
+      ],
+      "direct": true,
+      "requirements": [
+        "ipython; extra == \"all\"",
+        "fsspec; extra == \"all\"",
+        "numpy; extra == \"all\"",
+        "pandas; extra == \"all\"",
+        "pyarrow; extra == \"all\"",
+        "adbc-driver-manager; extra == \"all\""
+      ]
+    },
+    {
+      "name": "fonttools",
+      "version": "4.66.1",
+      "licenseMetadata": "MIT",
+      "projectUrls": [],
+      "direct": false,
+      "requirements": [
+        "lxml>=4.0; extra == \"lxml\"",
+        "brotli>=1.0.1; platform_python_implementation == \"CPython\" and extra == \"woff\"",
+        "brotlicffi>=0.8.0; platform_python_implementation != \"CPython\" and extra == \"woff\"",
+        "zopfli>=0.1.4; extra == \"woff\"",
+        "unicodedata2>=18.0.0; python_version <= \"3.15\" and extra == \"unicode\"",
+        "lz4>=1.7.4.2; extra == \"graphite\"",
+        "scipy; platform_python_implementation != \"PyPy\" and extra == \"interpolatable\"",
+        "munkres; platform_python_implementation == \"PyPy\" and extra == \"interpolatable\"",
+        "pycairo; extra == \"interpolatable\"",
+        "matplotlib; extra == \"plot\"",
+        "sympy; extra == \"symfont\"",
+        "xattr; sys_platform == \"darwin\" and extra == \"type1\"",
+        "skia-pathops>=0.5.0; extra == \"pathops\"",
+        "uharfbuzz>=0.45.0; extra == \"repacker\"",
+        "lxml>=4.0; extra == \"all\"",
+        "brotli>=1.0.1; platform_python_implementation == \"CPython\" and extra == \"all\"",
+        "brotlicffi>=0.8.0; platform_python_implementation != \"CPython\" and extra == \"all\"",
+        "zopfli>=0.1.4; extra == \"all\"",
+        "unicodedata2>=18.0.0; python_version <= \"3.15\" and extra == \"all\"",
+        "lz4>=1.7.4.2; extra == \"all\"",
+        "scipy; platform_python_implementation != \"PyPy\" and extra == \"all\"",
+        "munkres; platform_python_implementation == \"PyPy\" and extra == \"all\"",
+        "pycairo; extra == \"all\"",
+        "matplotlib; extra == \"all\"",
+        "sympy; extra == \"all\"",
+        "xattr; sys_platform == \"darwin\" and extra == \"all\"",
+        "skia-pathops>=0.5.0; extra == \"all\"",
+        "uharfbuzz>=0.45.0; extra == \"all\""
+      ]
+    },
+    {
+      "name": "fsspec",
+      "version": "2026.2.0",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Changelog, https://filesystem-spec.readthedocs.io/en/latest/changelog.html",
+        "Documentation, https://filesystem-spec.readthedocs.io/en/latest/",
+        "Homepage, https://github.com/fsspec/filesystem_spec"
+      ],
+      "direct": false,
+      "requirements": [
+        "adlfs; extra == 'abfs'",
+        "adlfs; extra == 'adl'",
+        "pyarrow>=1; extra == 'arrow'",
+        "dask; extra == 'dask'",
+        "distributed; extra == 'dask'",
+        "pre-commit; extra == 'dev'",
+        "ruff>=0.5; extra == 'dev'",
+        "numpydoc; extra == 'doc'",
+        "sphinx; extra == 'doc'",
+        "sphinx-design; extra == 'doc'",
+        "sphinx-rtd-theme; extra == 'doc'",
+        "yarl; extra == 'doc'",
+        "dropbox; extra == 'dropbox'",
+        "dropboxdrivefs; extra == 'dropbox'",
+        "requests; extra == 'dropbox'",
+        "adlfs; extra == 'full'",
+        "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'full'",
+        "dask; extra == 'full'",
+        "distributed; extra == 'full'",
+        "dropbox; extra == 'full'",
+        "dropboxdrivefs; extra == 'full'",
+        "fusepy; extra == 'full'",
+        "gcsfs>2024.2.0; extra == 'full'",
+        "libarchive-c; extra == 'full'",
+        "ocifs; extra == 'full'",
+        "panel; extra == 'full'",
+        "paramiko; extra == 'full'",
+        "pyarrow>=1; extra == 'full'",
+        "pygit2; extra == 'full'",
+        "requests; extra == 'full'",
+        "s3fs>2024.2.0; extra == 'full'",
+        "smbprotocol; extra == 'full'",
+        "tqdm; extra == 'full'",
+        "fusepy; extra == 'fuse'",
+        "gcsfs>2024.2.0; extra == 'gcs'",
+        "pygit2; extra == 'git'",
+        "requests; extra == 'github'",
+        "gcsfs; extra == 'gs'",
+        "panel; extra == 'gui'",
+        "pyarrow>=1; extra == 'hdfs'",
+        "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'http'",
+        "libarchive-c; extra == 'libarchive'",
+        "ocifs; extra == 'oci'",
+        "s3fs>2024.2.0; extra == 's3'",
+        "paramiko; extra == 'sftp'",
+        "smbprotocol; extra == 'smb'",
+        "paramiko; extra == 'ssh'",
+        "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'test'",
+        "numpy; extra == 'test'",
+        "pytest; extra == 'test'",
+        "pytest-asyncio!=0.22.0; extra == 'test'",
+        "pytest-benchmark; extra == 'test'",
+        "pytest-cov; extra == 'test'",
+        "pytest-mock; extra == 'test'",
+        "pytest-recording; extra == 'test'",
+        "pytest-rerunfailures; extra == 'test'",
+        "requests; extra == 'test'",
+        "aiobotocore<3.0.0,>=2.5.4; extra == 'test-downstream'",
+        "dask[dataframe,test]; extra == 'test-downstream'",
+        "moto[server]<5,>4; extra == 'test-downstream'",
+        "pytest-timeout; extra == 'test-downstream'",
+        "xarray; extra == 'test-downstream'",
+        "adlfs; extra == 'test-full'",
+        "aiohttp!=4.0.0a0,!=4.0.0a1; extra == 'test-full'",
+        "backports-zstd; (python_version < '3.14') and extra == 'test-full'",
+        "cloudpickle; extra == 'test-full'",
+        "dask; extra == 'test-full'",
+        "distributed; extra == 'test-full'",
+        "dropbox; extra == 'test-full'",
+        "dropboxdrivefs; extra == 'test-full'",
+        "fastparquet; extra == 'test-full'",
+        "fusepy; extra == 'test-full'",
+        "gcsfs; extra == 'test-full'",
+        "jinja2; extra == 'test-full'",
+        "kerchunk; extra == 'test-full'",
+        "libarchive-c; extra == 'test-full'",
+        "lz4; extra == 'test-full'",
+        "notebook; extra == 'test-full'",
+        "numpy; extra == 'test-full'",
+        "ocifs; extra == 'test-full'",
+        "pandas<3.0.0; extra == 'test-full'",
+        "panel; extra == 'test-full'",
+        "paramiko; extra == 'test-full'",
+        "pyarrow; extra == 'test-full'",
+        "pyarrow>=1; extra == 'test-full'",
+        "pyftpdlib; extra == 'test-full'",
+        "pygit2; extra == 'test-full'",
+        "pytest; extra == 'test-full'",
+        "pytest-asyncio!=0.22.0; extra == 'test-full'",
+        "pytest-benchmark; extra == 'test-full'",
+        "pytest-cov; extra == 'test-full'",
+        "pytest-mock; extra == 'test-full'",
+        "pytest-recording; extra == 'test-full'",
+        "pytest-rerunfailures; extra == 'test-full'",
+        "python-snappy; extra == 'test-full'",
+        "requests; extra == 'test-full'",
+        "smbprotocol; extra == 'test-full'",
+        "tqdm; extra == 'test-full'",
+        "urllib3; extra == 'test-full'",
+        "zarr; extra == 'test-full'",
+        "zstandard; (python_version < '3.14') and extra == 'test-full'",
+        "tqdm; extra == 'tqdm'"
+      ]
+    },
+    {
+      "name": "hftbacktest",
+      "version": "2.4.4",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Repository, https://github.com/nkaz001/hftbacktest"
+      ],
+      "direct": true,
+      "requirements": [
+        "numpy>=2.0,<2.3",
+        "numba~=0.61",
+        "polars",
+        "matplotlib",
+        "holoviews",
+        "databento ; extra == 'databento'"
+      ]
+    },
+    {
+      "name": "holoviews",
+      "version": "1.23.2",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Issue Tracker, https://github.com/holoviz/holoviews/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen",
+        "Blog, https://blog.holoviz.org/",
+        "Changelog, https://github.com/holoviz/holoviews/blob/main/doc/releases.md",
+        "Discord, https://discord.gg/AXRHnJU6sP",
+        "Discourse, https://discourse.holoviz.org",
+        "Discussions, https://github.com/holoviz/holoviews/discussions",
+        "Documentation, https://holoviews.org/",
+        "Funding, https://opencollective.com/holoviz",
+        "HoloViz, https://holoviz.org/",
+        "Homepage, https://holoviews.org",
+        "Repository, https://github.com/holoviz/holoviews"
+      ],
+      "direct": false,
+      "requirements": [
+        "bokeh>=3.1",
+        "colorcet",
+        "narwhals>=2",
+        "numpy>=1.21",
+        "pandas>=1.3",
+        "panel>=1.0",
+        "param<3.0,>=2.0",
+        "python-dateutil>=2.8.2",
+        "pyviz-comms>=2.1",
+        "matplotlib>=3; extra == 'recommended'",
+        "plotly>=4.0; extra == 'recommended'"
+      ]
+    },
+    {
+      "name": "idna",
+      "version": "3.20",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Changelog, https://github.com/kjd/idna/blob/master/HISTORY.md",
+        "Issue tracker, https://github.com/kjd/idna/issues",
+        "Source, https://github.com/kjd/idna"
+      ],
+      "direct": false,
+      "requirements": [
+        "ruff >= 0.16.0 ; extra == \"all\"",
+        "mypy >= 1.11.2 ; extra == \"all\"",
+        "ty >= 0.0.37 ; extra == \"all\"",
+        "pytest >= 8.3.2 ; extra == \"all\"",
+        "hypothesis >= 6.141.1 ; extra == \"all\"",
+        "coverage >= 7.10.0 ; extra == \"all\""
+      ]
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.1",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Homepage, https://github.com/pytest-dev/iniconfig"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Changes, https://jinja.palletsprojects.com/changes/",
+        "Chat, https://discord.gg/pallets",
+        "Documentation, https://jinja.palletsprojects.com/",
+        "Donate, https://palletsprojects.com/donate",
+        "Source, https://github.com/pallets/jinja/"
+      ],
+      "direct": false,
+      "requirements": [
+        "MarkupSafe>=2.0",
+        "Babel>=2.7 ; extra == \"i18n\""
+      ]
+    },
+    {
+      "name": "joblib",
+      "version": "1.6.0",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Homepage, https://joblib.readthedocs.io",
+        "Source, https://github.com/joblib/joblib"
+      ],
+      "direct": false,
+      "requirements": [
+        "cloudpickle>=3.0",
+        "distributed; extra == \"test\"",
+        "lz4; extra == \"test\"",
+        "numpy; extra == \"test\"",
+        "memory_profiler; extra == \"test\"",
+        "pytest; extra == \"test\"",
+        "pytest-asyncio; extra == \"test\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest-run-parallel; extra == \"test\"",
+        "pytest-timeout; extra == \"test\"",
+        "threadpoolctl; extra == \"test\"",
+        "distributed; extra == \"docs\"",
+        "lz4; extra == \"docs\"",
+        "numpy; extra == \"docs\"",
+        "numpydoc; extra == \"docs\"",
+        "matplotlib; extra == \"docs\"",
+        "pandas; extra == \"docs\"",
+        "psutil; extra == \"docs\"",
+        "sphinx; extra == \"docs\"",
+        "pydata-sphinx-theme; extra == \"docs\"",
+        "sphinx-gallery; extra == \"docs\"",
+        "sphinx-copybutton; extra == \"docs\"",
+        "sphinx-design; extra == \"docs\"",
+        "tqdm; extra == \"docs\""
+      ]
+    },
+    {
+      "name": "kiwisolver",
+      "version": "1.5.1",
+      "licenseMetadata": "=========================",
+      "projectUrls": [
+        "homepage, https://github.com/nucleic/kiwi",
+        "documentation, https://kiwisolver.readthedocs.io/en/latest/",
+        "repository, https://github.com/nucleic/kiwi",
+        "changelog, https://github.com/nucleic/kiwi/blob/main/releasenotes.rst"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "lightgbm",
+      "version": "4.7.0",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "homepage, https://github.com/lightgbm-org/LightGBM",
+        "documentation, https://lightgbm.readthedocs.io/en/latest/",
+        "repository, https://github.com/lightgbm-org/LightGBM.git",
+        "changelog, https://github.com/lightgbm-org/LightGBM/releases"
+      ],
+      "direct": true,
+      "requirements": [
+        "narwhals>=1.15",
+        "numpy>=1.21.3",
+        "scipy",
+        "narwhals[pyarrow]; extra == \"arrow\"",
+        "pyarrow>=16.0.0; extra == \"arrow\"",
+        "dask[array,dataframe,distributed]>=2.0.0; extra == \"dask\"",
+        "narwhals[pandas]; extra == \"dask\"",
+        "pandas>=1.3.4; extra == \"dask\"",
+        "narwhals[pandas]; extra == \"pandas\"",
+        "pandas>=1.3.4; extra == \"pandas\"",
+        "graphviz; extra == \"plotting\"",
+        "matplotlib; extra == \"plotting\"",
+        "narwhals[polars]; extra == \"polars\"",
+        "polars>=1.0.0; extra == \"polars\"",
+        "scikit-learn>=1.0.2; extra == \"scikit-learn\""
+      ]
+    },
+    {
+      "name": "linkify-it-py",
+      "version": "2.2.0",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Homepage, https://github.com/tsutsu3/linkify-it-py"
+      ],
+      "direct": false,
+      "requirements": [
+        "pytest; extra == \"test\"",
+        "coverage; extra == \"test\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest-timeout; extra == \"test\"",
+        "pre-commit; extra == \"dev\"",
+        "isort; extra == \"dev\"",
+        "flake8; extra == \"dev\"",
+        "black; extra == \"dev\"",
+        "pyproject-flake8; extra == \"dev\"",
+        "pytest; extra == \"benchmark\"",
+        "pytest-benchmark; extra == \"benchmark\"",
+        "sphinx; extra == \"doc\"",
+        "sphinx_book_theme; extra == \"doc\"",
+        "myst-parser; extra == \"doc\""
+      ]
+    },
+    {
+      "name": "llvmlite",
+      "version": "0.50.0",
+      "licenseMetadata": "BSD-2-Clause AND Apache-2.0 WITH LLVM-exception",
+      "projectUrls": [
+        "Source, https://github.com/numba/llvmlite"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "Markdown",
+      "version": "3.11.1",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Homepage, https://Python-Markdown.github.io/",
+        "Documentation, https://Python-Markdown.github.io/",
+        "Repository, https://github.com/Python-Markdown/markdown",
+        "Issue Tracker, https://github.com/Python-Markdown/markdown/issues",
+        "Changelog, https://python-markdown.github.io/changelog/"
+      ],
+      "direct": false,
+      "requirements": [
+        "coverage; extra == \"testing\"",
+        "pyyaml; extra == \"testing\"",
+        "zensical==0.0.62; extra == \"docs\"",
+        "mdx_gh_links==0.4; extra == \"docs\"",
+        "mkdocstrings==1.0.6; extra == \"docs\"",
+        "mkdocstrings-python==1.16.8; extra == \"docs\"",
+        "pygments==2.21.0; extra == \"docs\"",
+        "pymdown-extensions==11.0.2; extra == \"docs\"",
+        "justhtml==3.11.2; extra == \"docs\"",
+        "ghp-import==2.1.0; extra == \"docs\""
+      ]
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.2.0",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Documentation, https://markdown-it-py.readthedocs.io",
+        "Homepage, https://github.com/executablebooks/markdown-it-py"
+      ],
+      "direct": false,
+      "requirements": [
+        "mdurl~=0.1",
+        "psutil ; extra == \"benchmarking\"",
+        "pytest ; extra == \"benchmarking\"",
+        "pytest-benchmark ; extra == \"benchmarking\"",
+        "commonmark~=0.9 ; extra == \"compare\"",
+        "markdown~=3.4 ; extra == \"compare\"",
+        "mistletoe~=1.0 ; extra == \"compare\"",
+        "mistune~=3.0 ; extra == \"compare\"",
+        "panflute~=2.3 ; extra == \"compare\"",
+        "markdown-it-pyrs ; extra == \"compare\"",
+        "linkify-it-py>=1,<3 ; extra == \"linkify\"",
+        "mdit-py-plugins>=0.5.0 ; extra == \"plugins\"",
+        "gprof2dot ; extra == \"profiling\"",
+        "mdit-py-plugins>=0.5.0 ; extra == \"rtd\"",
+        "myst-parser ; extra == \"rtd\"",
+        "pyyaml ; extra == \"rtd\"",
+        "sphinx ; extra == \"rtd\"",
+        "sphinx-copybutton ; extra == \"rtd\"",
+        "sphinx-design ; extra == \"rtd\"",
+        "sphinx-book-theme~=1.0 ; extra == \"rtd\"",
+        "jupyter_sphinx ; extra == \"rtd\"",
+        "ipykernel ; extra == \"rtd\"",
+        "coverage ; extra == \"testing\"",
+        "pytest ; extra == \"testing\"",
+        "pytest-cov ; extra == \"testing\"",
+        "pytest-regressions ; extra == \"testing\"",
+        "pytest-timeout ; extra == \"testing\"",
+        "requests ; extra == \"testing\""
+      ]
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "3.0.4",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Donate, https://palletsprojects.com/donate",
+        "Documentation, https://markupsafe.palletsprojects.com/",
+        "Changes, https://markupsafe.palletsprojects.com/page/changes/",
+        "Source, https://github.com/pallets/markupsafe/",
+        "Chat, https://discord.gg/pallets"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "matplotlib",
+      "version": "3.11.2",
+      "licenseMetadata": "License agreement for matplotlib versions 1.3.0 and later",
+      "projectUrls": [
+        "Homepage, https://matplotlib.org",
+        "Download, https://matplotlib.org/stable/install/index.html",
+        "Documentation, https://matplotlib.org",
+        "Source Code, https://github.com/matplotlib/matplotlib",
+        "Bug Tracker, https://github.com/matplotlib/matplotlib/issues",
+        "Forum, https://discourse.matplotlib.org/",
+        "Donate, https://numfocus.org/donate-to-matplotlib"
+      ],
+      "direct": false,
+      "requirements": [
+        "contourpy>=1.0.1",
+        "cycler>=0.10",
+        "fonttools>=4.28.2",
+        "kiwisolver>=1.3.1",
+        "numpy>=1.25",
+        "packaging>=20.0",
+        "pillow>=9",
+        "pyparsing>=3",
+        "python-dateutil>=2.7"
+      ]
+    },
+    {
+      "name": "mdit-py-plugins",
+      "version": "0.6.1",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Documentation, https://mdit-py-plugins.readthedocs.io",
+        "Homepage, https://github.com/executablebooks/mdit-py-plugins"
+      ],
+      "direct": false,
+      "requirements": [
+        "markdown-it-py>=2.0.0,<5.0.0",
+        "pre-commit ; extra == \"code-style\"",
+        "myst-parser ; extra == \"rtd\"",
+        "sphinx-book-theme ; extra == \"rtd\"",
+        "coverage ; extra == \"testing\"",
+        "pytest ; extra == \"testing\"",
+        "pytest-cov ; extra == \"testing\"",
+        "pytest-regressions ; extra == \"testing\"",
+        "pytest-timeout ; extra == \"testing\""
+      ]
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Homepage, https://github.com/executablebooks/mdurl"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "msgspec",
+      "version": "0.22.0",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Homepage, https://msgspec.dev",
+        "Issue Tracker, https://github.com/msgspec/msgspec/issues",
+        "Source, https://github.com/msgspec/msgspec"
+      ],
+      "direct": false,
+      "requirements": [
+        "tomli; python_version < \"3.11\" and extra == \"toml\"",
+        "tomli_w; extra == \"toml\"",
+        "pyyaml; extra == \"yaml\""
+      ]
+    },
+    {
+      "name": "narwhals",
+      "version": "2.27.1",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Homepage, https://github.com/narwhals-dev/narwhals",
+        "Documentation, https://narwhals-dev.github.io/narwhals/",
+        "Repository, https://github.com/narwhals-dev/narwhals",
+        "Bug Tracker, https://github.com/narwhals-dev/narwhals/issues"
+      ],
+      "direct": false,
+      "requirements": [
+        "cudf-cu12>=24.10.0 ; sys_platform == 'linux' and extra == 'cudf'",
+        "dask[dataframe]>=2024.8 ; extra == 'dask'",
+        "duckdb>=1.1 ; extra == 'duckdb'",
+        "ibis-framework>=6.0.0 ; extra == 'ibis'",
+        "packaging>=21.3 ; extra == 'ibis'",
+        "pyarrow-hotfix>=0.7 ; extra == 'ibis'",
+        "modin>=0.22.0 ; extra == 'modin'",
+        "pandas>=1.3.4 ; extra == 'pandas'",
+        "polars>=0.20.4 ; extra == 'polars'",
+        "pyarrow>=13.0.0 ; extra == 'pyarrow'",
+        "pyspark>=3.5.0 ; extra == 'pyspark'",
+        "pyspark[connect]>=3.5.0 ; extra == 'pyspark-connect'",
+        "narwhals[duckdb] ; extra == 'sql'",
+        "sqlparse>=0.5.5 ; extra == 'sql'",
+        "sqlframe>=3.22.0,!=3.39.3 ; extra == 'sqlframe'"
+      ]
+    },
+    {
+      "name": "nautilus_trader",
+      "version": "1.231.0",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "projectUrls": [
+        "Homepage, https://nautilustrader.io",
+        "Repository, https://github.com/nautechsystems/nautilus_trader",
+        "docs, https://nautilustrader.io/docs"
+      ],
+      "direct": true,
+      "requirements": [
+        "betfair-parser (==0.19.1) ; extra == \"betfair\"",
+        "click (>=8.4.1,<9.0.0)",
+        "defusedxml (>=0.7.1,<1.0.0) ; extra == \"ib\"",
+        "docker (>=7.2.0,<8.0.0) ; extra == \"docker\"",
+        "fsspec (==2026.2.0)",
+        "kaleido (>=1.3.0,<2.0.0) ; extra == \"visualization\"",
+        "msgspec (>=0.21.1,<1.0.0)",
+        "nautilus-ibapi (==10.45.1) ; extra == \"ib\"",
+        "numpy (>=1.26.4)",
+        "pandas (>=2.3.3,<4.0.0)",
+        "plotly (>=6.9.0,<7.0.0) ; extra == \"visualization\"",
+        "portion (>=2.6.1)",
+        "protobuf (==5.29.6) ; extra == \"ib\"",
+        "py-clob-client-v2 (>=1.0.2,<2.0.0) ; extra == \"polymarket\"",
+        "pyarrow (>=25.0.0)",
+        "pytz (>=2026.2)",
+        "simplejson (==3.20.2) ; extra == \"visualization\"",
+        "tqdm (>=4.68.4,<5.0.0)",
+        "tzdata (>=2026.3)",
+        "uvloop (==0.22.1) ; sys_platform != \"win32\""
+      ]
+    },
+    {
+      "name": "nh3",
+      "version": "0.3.7",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Source Code, https://github.com/messense/nh3"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "numba",
+      "version": "0.68.0",
+      "licenseMetadata": "BSD",
+      "projectUrls": [],
+      "direct": false,
+      "requirements": [
+        "llvmlite<0.51,>=0.50.0dev0",
+        "numpy<2.6,>=1.22"
+      ]
+    },
+    {
+      "name": "numpy",
+      "version": "2.2.6",
+      "licenseMetadata": "Copyright (c) 2005-2024, NumPy Developers.",
+      "projectUrls": [
+        "homepage, https://numpy.org",
+        "documentation, https://numpy.org/doc/",
+        "source, https://github.com/numpy/numpy",
+        "download, https://pypi.org/project/numpy/#files",
+        "tracker, https://github.com/numpy/numpy/issues",
+        "release notes, https://numpy.org/doc/stable/release"
+      ],
+      "direct": true,
+      "requirements": []
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "licenseMetadata": "Apache-2.0 OR BSD-2-Clause",
+      "projectUrls": [
+        "Documentation, https://packaging.pypa.io/",
+        "Source, https://github.com/pypa/packaging"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "pandas",
+      "version": "2.3.3",
+      "licenseMetadata": "BSD 3-Clause License",
+      "projectUrls": [
+        "homepage, https://pandas.pydata.org",
+        "documentation, https://pandas.pydata.org/docs/",
+        "repository, https://github.com/pandas-dev/pandas"
+      ],
+      "direct": true,
+      "requirements": [
+        "numpy>=1.22.4; python_version < \"3.11\"",
+        "numpy>=1.23.2; python_version == \"3.11\"",
+        "numpy>=1.26.0; python_version >= \"3.12\"",
+        "python-dateutil>=2.8.2",
+        "pytz>=2020.1",
+        "tzdata>=2022.7",
+        "hypothesis>=6.46.1; extra == \"test\"",
+        "pytest>=7.3.2; extra == \"test\"",
+        "pytest-xdist>=2.2.0; extra == \"test\"",
+        "pyarrow>=10.0.1; extra == \"pyarrow\"",
+        "bottleneck>=1.3.6; extra == \"performance\"",
+        "numba>=0.56.4; extra == \"performance\"",
+        "numexpr>=2.8.4; extra == \"performance\"",
+        "scipy>=1.10.0; extra == \"computation\"",
+        "xarray>=2022.12.0; extra == \"computation\"",
+        "fsspec>=2022.11.0; extra == \"fss\"",
+        "s3fs>=2022.11.0; extra == \"aws\"",
+        "gcsfs>=2022.11.0; extra == \"gcp\"",
+        "pandas-gbq>=0.19.0; extra == \"gcp\"",
+        "odfpy>=1.4.1; extra == \"excel\"",
+        "openpyxl>=3.1.0; extra == \"excel\"",
+        "python-calamine>=0.1.7; extra == \"excel\"",
+        "pyxlsb>=1.0.10; extra == \"excel\"",
+        "xlrd>=2.0.1; extra == \"excel\"",
+        "xlsxwriter>=3.0.5; extra == \"excel\"",
+        "pyarrow>=10.0.1; extra == \"parquet\"",
+        "pyarrow>=10.0.1; extra == \"feather\"",
+        "tables>=3.8.0; extra == \"hdf5\"",
+        "pyreadstat>=1.2.0; extra == \"spss\"",
+        "SQLAlchemy>=2.0.0; extra == \"postgresql\"",
+        "psycopg2>=2.9.6; extra == \"postgresql\"",
+        "adbc-driver-postgresql>=0.8.0; extra == \"postgresql\"",
+        "SQLAlchemy>=2.0.0; extra == \"mysql\"",
+        "pymysql>=1.0.2; extra == \"mysql\"",
+        "SQLAlchemy>=2.0.0; extra == \"sql-other\"",
+        "adbc-driver-postgresql>=0.8.0; extra == \"sql-other\"",
+        "adbc-driver-sqlite>=0.8.0; extra == \"sql-other\"",
+        "beautifulsoup4>=4.11.2; extra == \"html\"",
+        "html5lib>=1.1; extra == \"html\"",
+        "lxml>=4.9.2; extra == \"html\"",
+        "lxml>=4.9.2; extra == \"xml\"",
+        "matplotlib>=3.6.3; extra == \"plot\"",
+        "jinja2>=3.1.2; extra == \"output-formatting\"",
+        "tabulate>=0.9.0; extra == \"output-formatting\"",
+        "PyQt5>=5.15.9; extra == \"clipboard\"",
+        "qtpy>=2.3.0; extra == \"clipboard\"",
+        "zstandard>=0.19.0; extra == \"compression\"",
+        "dataframe-api-compat>=0.1.7; extra == \"consortium-standard\"",
+        "adbc-driver-postgresql>=0.8.0; extra == \"all\"",
+        "adbc-driver-sqlite>=0.8.0; extra == \"all\"",
+        "beautifulsoup4>=4.11.2; extra == \"all\"",
+        "bottleneck>=1.3.6; extra == \"all\"",
+        "dataframe-api-compat>=0.1.7; extra == \"all\"",
+        "fastparquet>=2022.12.0; extra == \"all\"",
+        "fsspec>=2022.11.0; extra == \"all\"",
+        "gcsfs>=2022.11.0; extra == \"all\"",
+        "html5lib>=1.1; extra == \"all\"",
+        "hypothesis>=6.46.1; extra == \"all\"",
+        "jinja2>=3.1.2; extra == \"all\"",
+        "lxml>=4.9.2; extra == \"all\"",
+        "matplotlib>=3.6.3; extra == \"all\"",
+        "numba>=0.56.4; extra == \"all\"",
+        "numexpr>=2.8.4; extra == \"all\"",
+        "odfpy>=1.4.1; extra == \"all\"",
+        "openpyxl>=3.1.0; extra == \"all\"",
+        "pandas-gbq>=0.19.0; extra == \"all\"",
+        "psycopg2>=2.9.6; extra == \"all\"",
+        "pyarrow>=10.0.1; extra == \"all\"",
+        "pymysql>=1.0.2; extra == \"all\"",
+        "PyQt5>=5.15.9; extra == \"all\"",
+        "pyreadstat>=1.2.0; extra == \"all\"",
+        "pytest>=7.3.2; extra == \"all\"",
+        "pytest-xdist>=2.2.0; extra == \"all\"",
+        "python-calamine>=0.1.7; extra == \"all\"",
+        "pyxlsb>=1.0.10; extra == \"all\"",
+        "qtpy>=2.3.0; extra == \"all\"",
+        "scipy>=1.10.0; extra == \"all\"",
+        "s3fs>=2022.11.0; extra == \"all\"",
+        "SQLAlchemy>=2.0.0; extra == \"all\"",
+        "tables>=3.8.0; extra == \"all\"",
+        "tabulate>=0.9.0; extra == \"all\"",
+        "xarray>=2022.12.0; extra == \"all\"",
+        "xlrd>=2.0.1; extra == \"all\"",
+        "xlsxwriter>=3.0.5; extra == \"all\"",
+        "zstandard>=0.19.0; extra == \"all\""
+      ]
+    },
+    {
+      "name": "panel",
+      "version": "1.9.4",
+      "licenseMetadata": "BSD",
+      "projectUrls": [
+        "Homepage, https://panel.holoviz.org",
+        "Source, https://github.com/holoviz/panel",
+        "HoloViz, https://holoviz.org/"
+      ],
+      "direct": false,
+      "requirements": [
+        "bokeh<3.10.0,>=3.7.0",
+        "linkify-it-py",
+        "markdown",
+        "markdown-it-py",
+        "mdit-py-plugins",
+        "narwhals>=2",
+        "nh3",
+        "packaging",
+        "pandas>=1.2",
+        "panel-material-ui>=0.10.0",
+        "param<3.0,>=2.1.0",
+        "pyviz-comms>=2.0.0",
+        "requests",
+        "tqdm",
+        "typing-extensions",
+        "watchfiles; extra == 'dev'",
+        "bokeh-fastapi<0.2.0,>=0.1.5; extra == 'fastapi'",
+        "fastapi[standard]; extra == 'fastapi'",
+        "mypy; extra == 'mypy'",
+        "pandas-stubs; extra == 'mypy'",
+        "types-croniter; extra == 'mypy'",
+        "types-markdown; extra == 'mypy'",
+        "types-psutil; extra == 'mypy'",
+        "types-requests; extra == 'mypy'",
+        "types-tqdm; extra == 'mypy'",
+        "typing-extensions; extra == 'mypy'",
+        "holoviews>=1.18.0; extra == 'recommended'",
+        "jupyterlab; extra == 'recommended'",
+        "matplotlib; extra == 'recommended'",
+        "pillow; extra == 'recommended'",
+        "plotly; extra == 'recommended'",
+        "psutil; extra == 'tests'",
+        "pytest; extra == 'tests'",
+        "pytest-asyncio; extra == 'tests'",
+        "pytest-rerunfailures<16.0; extra == 'tests'",
+        "pytest-xdist; extra == 'tests'"
+      ]
+    },
+    {
+      "name": "panel-material-ui",
+      "version": "0.16.2",
+      "licenseMetadata": "BSD",
+      "projectUrls": [
+        "Homepage, https://github.com/panel-extensions/panel-material-ui",
+        "Source, https://github.com/panel-extensions/panel-material-ui"
+      ],
+      "direct": false,
+      "requirements": [
+        "bokeh>=3.8.0",
+        "packaging",
+        "panel>=1.9.0",
+        "plotly; extra == 'dev'",
+        "pytest; extra == 'dev'",
+        "pytest-asyncio; extra == 'dev'",
+        "pytest-rerunfailures<16; extra == 'dev'",
+        "pytest-xdist; extra == 'dev'",
+        "watchfiles; extra == 'dev'",
+        "mypy; extra == 'mypy'",
+        "types-requests; extra == 'mypy'",
+        "typing-extensions; extra == 'mypy'"
+      ]
+    },
+    {
+      "name": "param",
+      "version": "2.4.2",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Homepage, https://param.holoviz.org/",
+        "Tracker, https://github.com/holoviz/param/issues",
+        "Releases, https://github.com/holoviz/param/releases",
+        "Source, https://github.com/holoviz/param",
+        "HoloViz, https://holoviz.org/"
+      ],
+      "direct": false,
+      "requirements": [
+        "aiohttp; extra == 'all'",
+        "cloudpickle; extra == 'all'",
+        "gmpy2; extra == 'all'",
+        "ipython; extra == 'all'",
+        "jsonschema; extra == 'all'",
+        "nbval; extra == 'all'",
+        "nest-asyncio; extra == 'all'",
+        "numpy; extra == 'all'",
+        "odfpy; extra == 'all'",
+        "openpyxl; extra == 'all'",
+        "pandas; extra == 'all'",
+        "panel; extra == 'all'",
+        "pyarrow; extra == 'all'",
+        "pytest; extra == 'all'",
+        "pytest-asyncio; extra == 'all'",
+        "pytest-cov; extra == 'all'",
+        "pytest-xdist; extra == 'all'",
+        "tables; extra == 'all'",
+        "xlrd; extra == 'all'",
+        "aiohttp; extra == 'examples'",
+        "pandas; extra == 'examples'",
+        "panel; extra == 'examples'",
+        "pytest; extra == 'tests'",
+        "pytest-asyncio; extra == 'tests'",
+        "pytest-cov; extra == 'tests'",
+        "odfpy; extra == 'tests-deser'",
+        "openpyxl; extra == 'tests-deser'",
+        "pyarrow; extra == 'tests-deser'",
+        "tables; extra == 'tests-deser'",
+        "xlrd; extra == 'tests-deser'",
+        "aiohttp; extra == 'tests-examples'",
+        "nbval; extra == 'tests-examples'",
+        "pandas; extra == 'tests-examples'",
+        "panel; extra == 'tests-examples'",
+        "pytest; extra == 'tests-examples'",
+        "pytest-asyncio; extra == 'tests-examples'",
+        "pytest-xdist; extra == 'tests-examples'",
+        "aiohttp; extra == 'tests-full'",
+        "cloudpickle; extra == 'tests-full'",
+        "gmpy2; extra == 'tests-full'",
+        "ipython; extra == 'tests-full'",
+        "jsonschema; extra == 'tests-full'",
+        "nbval; extra == 'tests-full'",
+        "nest-asyncio; extra == 'tests-full'",
+        "numpy; extra == 'tests-full'",
+        "odfpy; extra == 'tests-full'",
+        "openpyxl; extra == 'tests-full'",
+        "pandas; extra == 'tests-full'",
+        "panel; extra == 'tests-full'",
+        "pyarrow; extra == 'tests-full'",
+        "pytest; extra == 'tests-full'",
+        "pytest-asyncio; extra == 'tests-full'",
+        "pytest-cov; extra == 'tests-full'",
+        "pytest-xdist; extra == 'tests-full'",
+        "tables; extra == 'tests-full'",
+        "xlrd; extra == 'tests-full'",
+        "cloudpickle; extra == 'tests-pypy'",
+        "ipython; extra == 'tests-pypy'",
+        "jsonschema; extra == 'tests-pypy'",
+        "nest-asyncio; extra == 'tests-pypy'",
+        "numpy; extra == 'tests-pypy'"
+      ]
+    },
+    {
+      "name": "pillow",
+      "version": "12.3.0",
+      "licenseMetadata": "MIT-CMU",
+      "projectUrls": [
+        "Release notes, https://pillow.readthedocs.io/en/stable/releasenotes/index.html",
+        "Changelog, https://github.com/python-pillow/Pillow/releases",
+        "Documentation, https://pillow.readthedocs.io",
+        "Funding, https://tidelift.com/subscription/pkg/pypi-pillow?utm_source=pypi-pillow&utm_medium=pypi",
+        "Homepage, https://python-pillow.github.io",
+        "Mastodon, https://fosstodon.org/@pillow",
+        "Source, https://github.com/python-pillow/Pillow"
+      ],
+      "direct": false,
+      "requirements": [
+        "furo; extra == \"docs\"",
+        "olefile; extra == \"docs\"",
+        "sphinx>=8.2; extra == \"docs\"",
+        "sphinx-autobuild; extra == \"docs\"",
+        "sphinx-copybutton; extra == \"docs\"",
+        "sphinx-inline-tabs; extra == \"docs\"",
+        "sphinxext-opengraph; extra == \"docs\"",
+        "olefile; extra == \"fpx\"",
+        "olefile; extra == \"mic\"",
+        "arro3-compute; extra == \"test-arrow\"",
+        "arro3-core; extra == \"test-arrow\"",
+        "nanoarrow; extra == \"test-arrow\"",
+        "pyarrow; extra == \"test-arrow\"",
+        "coverage>=7.4.2; extra == \"tests\"",
+        "defusedxml; extra == \"tests\"",
+        "markdown2; extra == \"tests\"",
+        "olefile; extra == \"tests\"",
+        "packaging; extra == \"tests\"",
+        "pytest; extra == \"tests\"",
+        "pytest-cov; extra == \"tests\"",
+        "pytest-timeout; extra == \"tests\"",
+        "pytest-xdist; extra == \"tests\"",
+        "setuptools; extra == \"tests\"",
+        "trove-classifiers>=2024.10.12; extra == \"tests\"",
+        "defusedxml; extra == \"xmp\""
+      ]
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0",
+      "licenseMetadata": "MIT",
+      "projectUrls": [],
+      "direct": false,
+      "requirements": [
+        "pre-commit; extra == \"dev\"",
+        "tox; extra == \"dev\"",
+        "pytest; extra == \"testing\"",
+        "pytest-benchmark; extra == \"testing\"",
+        "coverage; extra == \"testing\""
+      ]
+    },
+    {
+      "name": "polars",
+      "version": "2.0.0",
+      "licenseMetadata": "Copyright (c) 2025 Ritchie Vink",
+      "projectUrls": [
+        "Homepage, https://www.pola.rs/",
+        "Documentation, https://docs.pola.rs/api/python/stable/reference/index.html",
+        "Repository, https://github.com/pola-rs/polars",
+        "Changelog, https://github.com/pola-rs/polars/releases"
+      ],
+      "direct": false,
+      "requirements": [
+        "polars-runtime-32==2.0.0",
+        "polars-runtime-64==2.0.0; extra == \"rt64\"",
+        "polars-runtime-compat==2.0.0; extra == \"rtcompat\"",
+        "polars_cloud>=0.11.0; extra == \"polars-cloud\"",
+        "numpy>=1.16.0; extra == \"numpy\"",
+        "pandas; extra == \"pandas\"",
+        "polars[pyarrow]; extra == \"pandas\"",
+        "pyarrow>=7.0.0; extra == \"pyarrow\"",
+        "pydantic; extra == \"pydantic\"",
+        "fastexcel>=0.9; extra == \"calamine\"",
+        "openpyxl>=3.0.0; extra == \"openpyxl\"",
+        "xlsx2csv>=0.8.0; extra == \"xlsx2csv\"",
+        "xlsxwriter; extra == \"xlsxwriter\"",
+        "polars[calamine,openpyxl,xlsx2csv,xlsxwriter]; extra == \"excel\"",
+        "adbc-driver-manager[dbapi]; extra == \"adbc\"",
+        "adbc-driver-sqlite[dbapi]; extra == \"adbc\"",
+        "connectorx>=0.3.2; extra == \"connectorx\"",
+        "sqlalchemy; extra == \"sqlalchemy\"",
+        "polars[pandas]; extra == \"sqlalchemy\"",
+        "polars[adbc,connectorx,sqlalchemy]; extra == \"database\"",
+        "fsspec; extra == \"fsspec\"",
+        "deltalake!=1.5.*,>=1.0.0; extra == \"deltalake\"",
+        "pyiceberg>=0.12.0; extra == \"iceberg\"",
+        "gevent; extra == \"async\"",
+        "cloudpickle; extra == \"cloudpickle\"",
+        "matplotlib; extra == \"graph\"",
+        "altair>=5.4.0; extra == \"plot\"",
+        "great-tables>=0.8.0; extra == \"style\"",
+        "tzdata; platform_system == \"Windows\" and extra == \"timezone\"",
+        "cudf-polars-cu12; extra == \"gpu\"",
+        "polars[async,cloudpickle,database,deltalake,excel,fsspec,graph,iceberg,numpy,pandas,plot,pyarrow,pydantic,style,timezone]; extra == \"all\""
+      ]
+    },
+    {
+      "name": "polars-runtime-32",
+      "version": "2.0.0",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "Changelog, https://github.com/pola-rs/polars/releases",
+        "Documentation, https://docs.pola.rs/api/python/stable/reference/index.html",
+        "Homepage, https://www.pola.rs/",
+        "Repository, https://github.com/pola-rs/polars"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "portion",
+      "version": "2.6.3",
+      "licenseMetadata": "LGPL-3.0-or-later",
+      "projectUrls": [
+        "homepage, https://github.com/AlexandreDecan/portion",
+        "repository, https://github.com/AlexandreDecan/portion",
+        "changelog, https://github.com/AlexandreDecan/portion/blob/master/CHANGELOG.md",
+        "documentation, https://github.com/AlexandreDecan/portion/blob/master/README.md",
+        "issues, https://github.com/AlexandreDecan/portion/issues",
+        "funding, https://github.com/sponsors/AlexandreDecan"
+      ],
+      "direct": false,
+      "requirements": [
+        "sortedcontainers~=2.4"
+      ]
+    },
+    {
+      "name": "pyarrow",
+      "version": "26.0.0",
+      "licenseMetadata": "Apache-2.0",
+      "projectUrls": [
+        "Homepage, https://arrow.apache.org/",
+        "Documentation, https://arrow.apache.org/docs/python",
+        "Repository, https://github.com/apache/arrow",
+        "Issues, https://github.com/apache/arrow/issues"
+      ],
+      "direct": true,
+      "requirements": []
+    },
+    {
+      "name": "Pygments",
+      "version": "2.21.0",
+      "licenseMetadata": "BSD-2-Clause",
+      "projectUrls": [
+        "Homepage, https://pygments.org",
+        "Documentation, https://pygments.org/docs",
+        "Source, https://github.com/pygments/pygments",
+        "Bug Tracker, https://github.com/pygments/pygments/issues",
+        "Changelog, https://github.com/pygments/pygments/blob/master/CHANGES"
+      ],
+      "direct": false,
+      "requirements": [
+        "colorama>=0.4.6; extra == 'windows-terminal'"
+      ]
+    },
+    {
+      "name": "pyparsing",
+      "version": "3.3.3",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Documentation, https://pyparsing-docs.readthedocs.io/en/latest/",
+        "Homepage, https://github.com/pyparsing/pyparsing/",
+        "Source, https://github.com/pyparsing/pyparsing.git"
+      ],
+      "direct": false,
+      "requirements": [
+        "railroad-diagrams ; extra == \"diagrams\"",
+        "jinja2 ; extra == \"diagrams\""
+      ]
+    },
+    {
+      "name": "pytest",
+      "version": "8.4.2",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Changelog, https://docs.pytest.org/en/stable/changelog.html",
+        "Contact, https://docs.pytest.org/en/stable/contact.html",
+        "Funding, https://docs.pytest.org/en/stable/sponsor.html",
+        "Homepage, https://docs.pytest.org/en/latest/",
+        "Source, https://github.com/pytest-dev/pytest",
+        "Tracker, https://github.com/pytest-dev/pytest/issues"
+      ],
+      "direct": true,
+      "requirements": [
+        "colorama>=0.4; sys_platform == \"win32\"",
+        "exceptiongroup>=1; python_version < \"3.11\"",
+        "iniconfig>=1",
+        "packaging>=20",
+        "pluggy<2,>=1.5",
+        "pygments>=2.7.2",
+        "tomli>=1; python_version < \"3.11\"",
+        "argcomplete; extra == \"dev\"",
+        "attrs>=19.2; extra == \"dev\"",
+        "hypothesis>=3.56; extra == \"dev\"",
+        "mock; extra == \"dev\"",
+        "requests; extra == \"dev\"",
+        "setuptools; extra == \"dev\"",
+        "xmlschema; extra == \"dev\""
+      ]
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "licenseMetadata": "Dual License",
+      "projectUrls": [
+        "Documentation, https://dateutil.readthedocs.io/en/stable/",
+        "Source, https://github.com/dateutil/dateutil"
+      ],
+      "direct": false,
+      "requirements": [
+        "six >=1.5"
+      ]
+    },
+    {
+      "name": "pytz",
+      "version": "2026.5",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Source, https://github.com/stub42/pytz.git",
+        "Issues, https://github.com/stub42/pytz/issues"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "pyviz_comms",
+      "version": "3.0.6",
+      "licenseMetadata": "BSD 3-Clause License",
+      "projectUrls": [
+        "Homepage, https://github.com/holoviz/pyviz_comms",
+        "Bug Tracker, https://github.com/holoviz/pyviz_comms/issues",
+        "Repository, https://github.com/holoviz/pyviz_comms.git"
+      ],
+      "direct": false,
+      "requirements": [
+        "param",
+        "flake8; extra == 'all'",
+        "jupyterlab~=4.0; extra == 'all'",
+        "keyring; extra == 'all'",
+        "pytest; extra == 'all'",
+        "rfc3986; extra == 'all'",
+        "setuptools>=40.8.0; extra == 'all'",
+        "twine; extra == 'all'",
+        "jupyterlab~=4.0; extra == 'build'",
+        "keyring; extra == 'build'",
+        "rfc3986; extra == 'build'",
+        "setuptools>=40.8.0; extra == 'build'",
+        "twine; extra == 'build'",
+        "flake8; extra == 'tests'",
+        "pytest; extra == 'tests'"
+      ]
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Bug Tracker, https://github.com/yaml/pyyaml/issues",
+        "CI, https://github.com/yaml/pyyaml/actions",
+        "Documentation, https://pyyaml.org/wiki/PyYAMLDocumentation",
+        "Mailing lists, http://lists.sourceforge.net/lists/listinfo/yaml-core",
+        "Source Code, https://github.com/yaml/pyyaml"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2",
+      "licenseMetadata": "Apache-2.0",
+      "projectUrls": [
+        "Documentation, https://requests.readthedocs.io",
+        "Source, https://github.com/psf/requests"
+      ],
+      "direct": false,
+      "requirements": [
+        "charset_normalizer<4,>=2",
+        "idna<4,>=2.5",
+        "urllib3<3,>=1.26",
+        "certifi>=2023.5.7",
+        "PySocks!=1.5.7,>=1.5.6; extra == \"socks\"",
+        "chardet<8,>=3.0.2; extra == \"use-chardet-on-py3\""
+      ]
+    },
+    {
+      "name": "scikit-learn",
+      "version": "1.7.2",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "homepage, https://scikit-learn.org",
+        "source, https://github.com/scikit-learn/scikit-learn",
+        "download, https://pypi.org/project/scikit-learn/#files",
+        "tracker, https://github.com/scikit-learn/scikit-learn/issues",
+        "release notes, https://scikit-learn.org/stable/whats_new"
+      ],
+      "direct": true,
+      "requirements": [
+        "numpy>=1.22.0",
+        "scipy>=1.8.0",
+        "joblib>=1.2.0",
+        "threadpoolctl>=3.1.0",
+        "numpy>=1.22.0; extra == \"build\"",
+        "scipy>=1.8.0; extra == \"build\"",
+        "cython>=3.0.10; extra == \"build\"",
+        "meson-python>=0.17.1; extra == \"build\"",
+        "numpy>=1.22.0; extra == \"install\"",
+        "scipy>=1.8.0; extra == \"install\"",
+        "joblib>=1.2.0; extra == \"install\"",
+        "threadpoolctl>=3.1.0; extra == \"install\"",
+        "matplotlib>=3.5.0; extra == \"benchmark\"",
+        "pandas>=1.4.0; extra == \"benchmark\"",
+        "memory_profiler>=0.57.0; extra == \"benchmark\"",
+        "matplotlib>=3.5.0; extra == \"docs\"",
+        "scikit-image>=0.19.0; extra == \"docs\"",
+        "pandas>=1.4.0; extra == \"docs\"",
+        "seaborn>=0.9.0; extra == \"docs\"",
+        "memory_profiler>=0.57.0; extra == \"docs\"",
+        "sphinx>=7.3.7; extra == \"docs\"",
+        "sphinx-copybutton>=0.5.2; extra == \"docs\"",
+        "sphinx-gallery>=0.17.1; extra == \"docs\"",
+        "numpydoc>=1.2.0; extra == \"docs\"",
+        "Pillow>=8.4.0; extra == \"docs\"",
+        "pooch>=1.6.0; extra == \"docs\"",
+        "sphinx-prompt>=1.4.0; extra == \"docs\"",
+        "sphinxext-opengraph>=0.9.1; extra == \"docs\"",
+        "plotly>=5.14.0; extra == \"docs\"",
+        "polars>=0.20.30; extra == \"docs\"",
+        "sphinx-design>=0.5.0; extra == \"docs\"",
+        "sphinx-design>=0.6.0; extra == \"docs\"",
+        "sphinxcontrib-sass>=0.3.4; extra == \"docs\"",
+        "pydata-sphinx-theme>=0.15.3; extra == \"docs\"",
+        "sphinx-remove-toctrees>=1.0.0.post1; extra == \"docs\"",
+        "towncrier>=24.8.0; extra == \"docs\"",
+        "matplotlib>=3.5.0; extra == \"examples\"",
+        "scikit-image>=0.19.0; extra == \"examples\"",
+        "pandas>=1.4.0; extra == \"examples\"",
+        "seaborn>=0.9.0; extra == \"examples\"",
+        "pooch>=1.6.0; extra == \"examples\"",
+        "plotly>=5.14.0; extra == \"examples\"",
+        "matplotlib>=3.5.0; extra == \"tests\"",
+        "scikit-image>=0.19.0; extra == \"tests\"",
+        "pandas>=1.4.0; extra == \"tests\"",
+        "pytest>=7.1.2; extra == \"tests\"",
+        "pytest-cov>=2.9.0; extra == \"tests\"",
+        "ruff>=0.11.7; extra == \"tests\"",
+        "mypy>=1.15; extra == \"tests\"",
+        "pyamg>=4.2.1; extra == \"tests\"",
+        "polars>=0.20.30; extra == \"tests\"",
+        "pyarrow>=12.0.0; extra == \"tests\"",
+        "numpydoc>=1.2.0; extra == \"tests\"",
+        "pooch>=1.6.0; extra == \"tests\"",
+        "conda-lock==3.0.1; extra == \"maintenance\""
+      ]
+    },
+    {
+      "name": "scipy",
+      "version": "1.18.1",
+      "licenseMetadata": "Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers.",
+      "projectUrls": [
+        "homepage, https://scipy.org/",
+        "documentation, https://docs.scipy.org/doc/scipy/",
+        "source, https://github.com/scipy/scipy",
+        "download, https://github.com/scipy/scipy/releases",
+        "tracker, https://github.com/scipy/scipy/issues"
+      ],
+      "direct": false,
+      "requirements": [
+        "numpy<2.8,>=2.0.0",
+        "pytest>=8.0.0; extra == \"test\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest-timeout; extra == \"test\"",
+        "pytest-xdist; extra == \"test\"",
+        "asv; extra == \"test\"",
+        "mpmath; extra == \"test\"",
+        "gmpy2; extra == \"test\"",
+        "threadpoolctl; extra == \"test\"",
+        "scikit-umfpack; extra == \"test\"",
+        "pooch; extra == \"test\"",
+        "hypothesis>=6.30; extra == \"test\"",
+        "array-api-strict>=2.3.1; extra == \"test\"",
+        "Cython; extra == \"test\"",
+        "meson; extra == \"test\"",
+        "ninja; sys_platform != \"emscripten\" and extra == \"test\"",
+        "scipy-doctest>=2.0.0; extra == \"test\"",
+        "sphinx<8.2.0,>=5.0.0; extra == \"doc\"",
+        "intersphinx_registry; extra == \"doc\"",
+        "pydata-sphinx-theme>=0.15.2; extra == \"doc\"",
+        "sphinx-copybutton; extra == \"doc\"",
+        "sphinx-design>=0.4.0; extra == \"doc\"",
+        "matplotlib>=3.5; extra == \"doc\"",
+        "numpydoc; extra == \"doc\"",
+        "jupytext; extra == \"doc\"",
+        "myst-nb>=1.2.0; extra == \"doc\"",
+        "pooch; extra == \"doc\"",
+        "jupyterlite-sphinx>=0.19.1; extra == \"doc\"",
+        "jupyterlite-pyodide-kernel; extra == \"doc\"",
+        "linkify-it-py; extra == \"doc\"",
+        "tabulate; extra == \"doc\"",
+        "click<8.3.0; extra == \"dev\"",
+        "spin; extra == \"dev\"",
+        "mypy==1.19.1; extra == \"dev\"",
+        "pyrefly==0.63.0; extra == \"dev\"",
+        "typing_extensions; extra == \"dev\"",
+        "types-psutil; extra == \"dev\"",
+        "pycodestyle; extra == \"dev\"",
+        "ruff>=0.12.0; extra == \"dev\"",
+        "cython-lint>=0.12.2; extra == \"dev\""
+      ]
+    },
+    {
+      "name": "six",
+      "version": "1.17.0",
+      "licenseMetadata": "MIT",
+      "projectUrls": [],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "sortedcontainers",
+      "version": "2.4.0",
+      "licenseMetadata": "Apache 2.0",
+      "projectUrls": [],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "TA-Lib",
+      "version": "0.8.2",
+      "licenseMetadata": "Seeinstalledlicensefiles",
+      "projectUrls": [
+        "homepage, http://github.com/ta-lib/ta-lib-python",
+        "download, https://github.com/ta-lib/ta-lib-python/releases"
+      ],
+      "direct": true,
+      "requirements": [
+        "numpy"
+      ]
+    },
+    {
+      "name": "threadpoolctl",
+      "version": "3.7.0",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "homepage, https://github.com/joblib/threadpoolctl"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "tornado",
+      "version": "6.5.10",
+      "licenseMetadata": "Apache-2.0",
+      "projectUrls": [
+        "Source, https://github.com/tornadoweb/tornado"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "tqdm",
+      "version": "4.70.1",
+      "licenseMetadata": "MPL-2.0 AND MIT",
+      "projectUrls": [
+        "homepage, https://tqdm.github.io",
+        "repository, https://github.com/tqdm/tqdm",
+        "changelog, https://tqdm.github.io/releases",
+        "wiki, https://github.com/tqdm/tqdm/wiki"
+      ],
+      "direct": false,
+      "requirements": [
+        "colorama; platform_system == \"Windows\"",
+        "requests; extra == \"discord\"",
+        "envwrap; extra == \"discord\"",
+        "slack-sdk; extra == \"slack\"",
+        "envwrap; extra == \"slack\"",
+        "requests; extra == \"telegram\"",
+        "envwrap; extra == \"telegram\"",
+        "ipywidgets>=6; extra == \"notebook\""
+      ]
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0",
+      "licenseMetadata": "PSF-2.0",
+      "projectUrls": [
+        "Bug Tracker, https://github.com/python/typing_extensions/issues",
+        "Changes, https://github.com/python/typing_extensions/blob/main/CHANGELOG.md",
+        "Documentation, https://typing-extensions.readthedocs.io/",
+        "Home, https://github.com/python/typing_extensions",
+        "Q & A, https://github.com/python/typing/discussions",
+        "Repository, https://github.com/python/typing_extensions"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.5",
+      "licenseMetadata": "Apache-2.0",
+      "projectUrls": [
+        "Bug Reports, https://github.com/python/tzdata/issues",
+        "Source, https://github.com/python/tzdata",
+        "Documentation, https://tzdata.python.org"
+      ],
+      "direct": false,
+      "requirements": []
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0",
+      "licenseMetadata": "MIT",
+      "projectUrls": [
+        "Changelog, https://github.com/urllib3/urllib3/blob/main/CHANGES.rst",
+        "Documentation, https://urllib3.readthedocs.io",
+        "Code, https://github.com/urllib3/urllib3",
+        "Issue tracker, https://github.com/urllib3/urllib3/issues",
+        "Security policy, https://urllib3.readthedocs.io/en/latest/security.html"
+      ],
+      "direct": false,
+      "requirements": [
+        "brotli>=1.2.0; (platform_python_implementation == 'CPython') and extra == 'brotli'",
+        "brotlicffi>=1.2.0.0; (platform_python_implementation != 'CPython') and extra == 'brotli'",
+        "h2<5,>=4; extra == 'h2'",
+        "pysocks!=1.5.7,<2.0,>=1.5.6; extra == 'socks'",
+        "backports-zstd>=1.0.0; (python_version < '3.14') and extra == 'zstd'"
+      ]
+    },
+    {
+      "name": "websockets",
+      "version": "17.2",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Homepage, https://github.com/python-websockets/websockets",
+        "Changelog, https://websockets.readthedocs.io/en/stable/project/changelog.html",
+        "Documentation, https://websockets.readthedocs.io/",
+        "Funding, https://tidelift.com/subscription/pkg/pypi-websockets?utm_source=pypi-websockets&utm_medium=referral&utm_campaign=readme",
+        "Tracker, https://github.com/python-websockets/websockets/issues"
+      ],
+      "direct": true,
+      "requirements": []
+    },
+    {
+      "name": "xyzservices",
+      "version": "2026.9.1",
+      "licenseMetadata": "BSD-3-Clause",
+      "projectUrls": [
+        "Homepage, https://github.com/geopandas/xyzservices",
+        "Repository, https://github.com/geopandas/xyzservices"
+      ],
+      "direct": false,
+      "requirements": []
+    }
+  ]
+}

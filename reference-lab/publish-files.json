@@ -1,0 +1,29 @@
+{
+  "repositoryDirectory": "reference-lab",
+  "include": [
+    ".gitignore",
+    "README.md",
+    "fetch-references.mjs",
+    "run-lean.ps1",
+    "compare-lean.mjs",
+    "finalize-report.mjs",
+    "manifest.json",
+    "source-decisions.json",
+    "comparison-real.json",
+    "artifact-checksums.json",
+    "dotnet-info.txt",
+    "publish-files.json",
+    "sources/lean/LICENSE",
+    "sources/lean/SimpleMovingAverage.cs",
+    "sources/lean/StandardDeviation.cs",
+    "sources/lean/Variance.cs",
+    "sources/freqtrade/LICENSE",
+    "sources/freqtrade/README.md",
+    "sources/freqtrade/interface.py",
+    "sources/freqtrade/lookahead-analysis.md",
+    "sources/freqtrade/pyproject.toml",
+    "sources/freqtrade/__init__.py"
+  ],
+  "exclude": ["packages/**", "runtime/**", "lean-output*.json", "oracle*.json", "cli-verification.json", "private-*.json", "source-market-data/**"],
+  "note": "Public code, licenses and aggregated proof only. Raw input data and per-observation LEAN prices remain private."
+}

@@ -1,3 +1,4 @@
+import {exitQuotePrice} from './execution-plan.mjs';
 // Observed level crossings are diagnostics. They are neither fills nor trade outcomes.
 const MINUTE=60000;
 const SIGNAL_INTERVAL=15*MINUTE;
@@ -95,10 +96,11 @@ export class SignalFollowup {
       const sameProviderTime=Number.isFinite(lastQuote)&&(quoteAt===lastQuote||eventAt===lastQuote);
       if(sameProviderTime&&(localAt===null||!Number.isFinite(lastReceipt)||localAt<=lastReceipt||quoteKey===row.last_quote_key))continue;
       const original=JSON.parse(row.payload),direction=original.side==='BUY'?1:-1;
-      const stopObserved=direction*(quote.price-original.stop)<=0,targetObserved=direction*(quote.price-original.target)>=0;
+      const exitPrice=exitQuotePrice(quote,original.side);if(exitPrice===null)continue;
+      const stopObserved=direction*(exitPrice-original.stop)<=0,targetObserved=direction*(exitPrice-original.target)>=0;
       const status=stopObserved?'stop-observed':targetObserved?'target-observed':'watching';
       const touched=status!=='watching';
-      changed+=Number(write.run(status,iso(quoteAt),localAt===null?null:iso(localAt),quoteKey,iso(at),touched?quote.price:null,touched?iso(at):null,row.id).changes);
+      changed+=Number(write.run(status,iso(quoteAt),localAt===null?null:iso(localAt),quoteKey,iso(at),touched?exitPrice:null,touched?iso(at):null,row.id).changes);
     }
     return changed;
   }

@@ -4,7 +4,7 @@ if(!isMainThread){
   parentPort.on('message',async({dataset,version})=>{
     try{
       const [{laboratory},{calibrateDecision},{replayDecisions}]=await Promise.all([import('./engine.mjs'),import('./decision.mjs'),import('./decision-replay.mjs')]);
-      const calibration=calibrateDecision(dataset),trainedAt=new Date().toISOString();
+      const calibration=calibrateDecision(dataset,{classCalibration:true,maxHistory:5000,boosting:true,directionalExperts:true}),trainedAt=new Date().toISOString();
       parentPort.postMessage({phase:'calibration',symbol:dataset.symbol,version,source:dataset.source,calibration,trainedAt});
       const laboratoryResult=laboratory(dataset),replay=replayDecisions(dataset,calibration),stress=replayDecisions(dataset,calibration,{costMultiplier:2});
       replay.stress={costMultiplier:2,status:stress.status,metrics:stress.metrics,counts:stress.counts};

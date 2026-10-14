@@ -1,0 +1,2 @@
+# Upstream v0.9.8 is not on PyPI (PyPI latest0.9.7). Immutable source archive.
+pyqlib @ https://github.com/microsoft/qlib/archive/54355232463878d2eebb91fe0ee5fa7fa1f5976c.zip

@@ -1,0 +1,6 @@
+# Isolated Qlib interpreter: MLflow<3.13 requires Arrow<24; Nautilus requires>=25.
+numpy==2.2.6
+pandas==2.3.3
+scikit-learn==1.7.2
+lightgbm==4.7.0
+pyarrow==23.0.1

@@ -18,6 +18,16 @@ function harness() {
   const db=new DatabaseSync(':memory:');let clock=baseline;
   return {db,tracker:new SignalFollowup(db,{now:()=>clock}),advance:ms=>clock+=ms,close:()=>db.close()};
 }
+
+test('follow-up observes the liquidation Bid/Ask when last price has not reached the stop',()=>{
+ for(const side of ['BUY','SELL']){const h=harness();try{
+  const event=fixture({side,stop:side==='BUY'?95:105,target:side==='BUY'?110:90});
+  assert.equal(h.tracker.record('book-'+side,event),true);
+  const at=h.advance(1000),quote={price:100,bid:side==='BUY'?94:99,ask:side==='SELL'?106:101,receivedAt:iso(at),transport:'websocket'};
+  h.tracker.observe({symbol:event.symbol,source:event.source,quote,fresh:true},at);
+  const row=h.tracker.snapshot().items[0];assert.equal(row.status,'stop-observed');assert.equal(row.observedPrice,side==='BUY'?94:106);
+ }finally{h.close();}}
+});
 function quote(price,at,overrides={}) {
   return {symbol:'BTC/USD',source:'Kraken public · spot',fresh:true,
     quote:{price,receivedAt:iso(at),localReceivedAt:iso(at),transport:'websocket'},...overrides};

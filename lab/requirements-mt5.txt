@@ -1,0 +1,2 @@
+# Optional Windows-only read-only terminal bridge. No account login or order execution.
+MetaTrader5==5.0.6231; sys_platform == 'win32'

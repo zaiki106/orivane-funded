@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-14T00:44:46.548Z",
+  "sources": [
+    {
+      "component": "QuantConnect LEAN indicators",
+      "repository": "https://github.com/QuantConnect/Lean",
+      "commit": "ea3d5159152530d58f3afe2feced990a0bf64b96",
+      "package": "QuantConnect.Indicators",
+      "version": "2.5.18164",
+      "documentation": [
+        "https://www.quantconnect.com/docs/v2/writing-algorithms/indicators/supported-indicators/simple-moving-average",
+        "https://www.quantconnect.com/docs/v2/writing-algorithms/indicators/supported-indicators/standard-deviation"
+      ],
+      "license": "Apache-2.0",
+      "decision": "take-isolated-oracle",
+      "necessaryData": "Real close prices, at least 20 chronological observations",
+      "freeLimits": "NuGet open-source assemblies; no cloud account used",
+      "test": {
+        "executed": true,
+        "engineScope": "Official indicator classes only",
+        "dataset": {
+          "symbol": "BTC/USD",
+          "source": "Kraken public · spot",
+          "timeframeMinutes": 15,
+          "bars": 720,
+          "first": "2026-10-06T08:45:00.000Z",
+          "last": "2026-10-13T20:30:00.000Z",
+          "inputSha256": "a7685616b660baf26526995b4613cc0a94faa1a2cf171f67266de4a56634bbde"
+        },
+        "comparison": {
+          "reference": "Unmodified official SMA(20) and population StandardDeviation(20)",
+          "implementation": "Orivane indicators().mean and indicators().sd on causal prefixes",
+          "leanReady": 701,
+          "orivaneWarmupBars": 60,
+          "compared": 661,
+          "absoluteTolerance": 1e-7,
+          "maxSmaError": 2.9103830456733704e-11,
+          "maxSdError": 2.8421709430404007e-12,
+          "passed": true
+        }
+      },
+      "adaptation": "Assembly loading harness and comparison; upstream classes remain unmodified"
+    },
+    {
+      "component": "Freqtrade",
+      "repository": "https://github.com/freqtrade/freqtrade",
+      "commit": "1f394eaebc2f46a83d26971388628707802f8602",
+      "version": "2026.9",
+      "documentation": [
+        "https://www.freqtrade.io/en/stable/lookahead-analysis/",
+        "https://www.freqtrade.io/en/stable/recursive-analysis/"
+      ],
+      "license": "GPLv3 (exact upstream pyproject metadata)",
+      "decision": "retain-isolated-reference",
+      "necessaryData": "Historical OHLCV for full strategy backtesting; exchange credentials only for optional live execution, unused here",
+      "freeLimits": "Open-source source inspection; no account or paid services used",
+      "test": {
+        "executed": false,
+        "inspection": "README, strategy interface, lookahead-analysis documentation and license inspected at pinned revision",
+        "findings": [
+          "Independent baseline and sliced backtests detect future-data leakage",
+          "Recursive warm-up checks are relevant to indicator initialization",
+          "Full strategy dataframe access can introduce lookahead bias; indicators need causal prefix tests"
+        ]
+      },
+      "adaptation": "No GPL code imported, copied or modified in the portable Orivane core; sources retained in this separate reference lab"
+    }
+  ],
+  "orderExecution": false,
+  "artificialPrices": false
+}

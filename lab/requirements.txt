@@ -1,0 +1,12 @@
+# Exact direct versions. requirements-lock.txt is generated after a verified install.
+duckdb==1.5.6
+pyarrow==26.0.0
+numpy==2.2.6
+pandas==2.3.3
+scikit-learn==1.7.2
+lightgbm==4.7.0
+TA-Lib==0.8.2
+nautilus_trader==1.231.0
+hftbacktest==2.4.4
+pytest==8.4.2
+websockets==17.2

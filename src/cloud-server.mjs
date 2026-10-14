@@ -42,4 +42,3 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
   app.server.listen(port,'0.0.0.0',()=>{console.log('Orivane cloud privé : serveur démarré');app.terminal.refresh().catch(()=>{});});
   for(const event of ['SIGINT','SIGTERM'])process.once(event,async()=>{await app.close();process.exit(0);});
 }
-

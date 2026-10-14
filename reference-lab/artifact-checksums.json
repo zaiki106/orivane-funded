@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-14T01:07:45.045Z",
+  "bytes": 15993452,
+  "budgetBytes": 209715200,
+  "files": [
+    {
+      "file": ".gitignore",
+      "bytes": 87,
+      "sha256": "4e4a83a6a45dc453c0a291519bc8faf5b709308219c8ae884a44d1287f396c1f"
+    },
+    {
+      "file": "cli-verification.json",
+      "bytes": 1682,
+      "sha256": "10475dd7bb97c3cd51c96b436bb7eb3ad55f570816b046badbe0f092754b9d9b"
+    },
+    {
+      "file": "compare-lean.mjs",
+      "bytes": 4156,
+      "sha256": "94d3cc2a1d8294d0a2789d7391f3b9482b8f815c07cd6e92a34cf53338a5f683"
+    },
+    {
+      "file": "comparison-real.json",
+      "bytes": 1664,
+      "sha256": "ea5fa3b4e13952f1d7ce70a567108987bb30851745fa110f245921b5282c325e"
+    },
+    {
+      "file": "dotnet-info.txt",
+      "bytes": 692,
+      "sha256": "1b4f2e49edba0cafb617c843eb51ca272b3d953c11f725ce572c9136d8627d35"
+    },
+    {
+      "file": "fetch-references.mjs",
+      "bytes": 3448,
+      "sha256": "54a768bad9c99158bd68c31fbae89873b20d3256c707e054c5a859c49a69719a"
+    },
+    {
+      "file": "finalize-report.mjs",
+      "bytes": 4205,
+      "sha256": "5e11a2b511f08e4c783d13fd5a360930549d424949e6c8bd52d7ae89a3a9dd21"
+    },
+    {
+      "file": "lean-output.json",
+      "bytes": 99500,
+      "sha256": "84309b6d23952a4107b70ed91f18c4eab05237f6560d222a12eb865652a40982"
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 9227,
+      "sha256": "6a02eea39491c5735c6fc6bd2728af4a716b8b848b84848f5945eab017a21f52"
+    },
+    {
+      "file": "packages/mathnet.numerics/5.0.0/mathnet.numerics.5.0.0.nupkg",
+      "bytes": 4174205,
+      "sha256": "44724254ce8ec6ab8917b9f931b7bfa0d6ee7016e481ee942dc6c07333a0995a"
+    },
+    {
+      "file": "packages/mathnet.numerics/5.0.0/mathnet.numerics.nuspec",
+      "bytes": 3453,
+      "sha256": "4665f5375ea4e89677281b35ad8b98fc0eb6abe2fed772d17e03e368daa9d5da"
+    },
+    {
+      "file": "packages/nodatime/3.0.5/nodatime.3.0.5.nupkg",
+      "bytes": 406571,
+      "sha256": "ee51ade41f35386c96bc39829eaf94008a22c766c65612a04db2eb5bf5f8786a"
+    },
+    {
+      "file": "packages/nodatime/3.0.5/nodatime.nuspec",
+      "bytes": 1024,
+      "sha256": "08aa7aea7791fc9bf25fe5b17ac379be5016f2736b7487eb4d893183deba6a6f"
+    },
+    {
+      "file": "packages/protobuf-net/3.1.33/protobuf-net.3.1.33.nupkg",
+      "bytes": 806760,
+      "sha256": "3f8884506bd1cd1ec6252845cfdd947005aa8e92a309006e1f26a659f91d29f2"
+    },
+    {
+      "file": "packages/protobuf-net/3.1.33/protobuf-net.nuspec",
+      "bytes": 2132,
+      "sha256": "b13536199ed5f04ca5ac2a5f0d4b89322f40488c70a5a49cb943f3937be9adbb"
+    },
+    {
+      "file": "packages/protobuf-net.core/3.1.33/protobuf-net.core.3.1.33.nupkg",
+      "bytes": 861273,
+      "sha256": "812e069eb948dc77f41fc4a5f9ff2cb754ba3c9787099ac3d4379607294a6db9"
+    },
+    {
+      "file": "packages/protobuf-net.core/3.1.33/protobuf-net.core.nuspec",
+      "bytes": 1934,
+      "sha256": "4b0b05c861e50c21b862bbea0b683ab6690a75c98e76affc15eba64c2d4ff5f5"
+    },
+    {
+      "file": "packages/quantconnect.common/2.5.18164/quantconnect.common.2.5.18164.nupkg",
+      "bytes": 1687503,
+      "sha256": "9c3a58215e1c6e79729af69bfadc9c35dfcbb295829079d923a1a217fffcf263"
+    },
+    {
+      "file": "packages/quantconnect.common/2.5.18164/quantconnect.common.nuspec",
+      "bytes": 2077,
+      "sha256": "3c694e7e442282b001d0ce3714d14d4f681561b833669c49f74f267997204170"
+    },
+    {
+      "file": "packages/quantconnect.configuration/2.5.18164/quantconnect.configuration.2.5.18164.nupkg",
+      "bytes": 33075,
+      "sha256": "cf646d3945d6afd41df68b33f2b6c7fc67a3fb60511bae5477c6d0d8c1f3ae53"
+    },
+    {
+      "file": "packages/quantconnect.configuration/2.5.18164/quantconnect.configuration.nuspec",
+      "bytes": 972,
+      "sha256": "1ca179431201fc2dfe54084c8114fa84c91ee2cec315389a68710bad63ebcc5e"
+    },
+    {
+      "file": "packages/quantconnect.indicators/2.5.18164/quantconnect.indicators.2.5.18164.nupkg",
+      "bytes": 186014,
+      "sha256": "a06ac16469bd0249fd6b7d9642864a320add5bc475d8274f14094a34827d5011"
+    },
+    {
+      "file": "packages/quantconnect.indicators/2.5.18164/quantconnect.indicators.nuspec",
+      "bytes": 1035,
+      "sha256": "72a3fbc42817ebed385dcb6be305442d3de61845aee959fed73fd0668c4e155a"
+    },
+    {
+      "file": "packages/quantconnect.logging/2.5.18164/quantconnect.logging.2.5.18164.nupkg",
+      "bytes": 29627,
+      "sha256": "942be4f774d523e7e7d08321c4c35670b8e61584f2a42394a68fe56f5a021017"
+    },
+    {
+      "file": "packages/quantconnect.logging/2.5.18164/quantconnect.logging.nuspec",
+      "bytes": 758,
+      "sha256": "d7585019e17cb81115e0c283a9568015eb0150635527a664685baab26cde083d"
+    },
+    {
+      "file": "packages/quantconnect.pythonnet/2.0.66/quantconnect.pythonnet.2.0.66.nupkg",
+      "bytes": 535781,
+      "sha256": "5d147a167fde5251f7d2e197f7e27183c3f310d106d35dc978cf159f37b6a250"
+    },
+    {
+      "file": "packages/quantconnect.pythonnet/2.0.66/quantconnect.pythonnet.nuspec",
+      "bytes": 1979,
+      "sha256": "4dcbfa356d2ade19d1d95ed63ef012c5b2d07cbe30a87d296f1a23ca7ad64ff2"
+    },
+    {
+      "file": "publish-files.json",
+      "bytes": 1004,
+      "sha256": "2cc01efa86ac32e5b7767c9c454302b7d1e97e4d48a9169a57485a9ef58bcb30"
+    },
+    {
+      "file": "README.md",
+      "bytes": 4969,
+      "sha256": "cf4a9e9a6227abdb6ca3887d1cb359f230a9e683743e0e779dc6e730a040ca6e"
+    },
+    {
+      "file": "run-lean.ps1",
+      "bytes": 3848,
+      "sha256": "9ae3577083b0c4b0d7bc3263eb3bf5f1a1a158f2568d9e800fdb32ef46aefbe5"
+    },
+    {
+      "file": "runtime/MathNet.Numerics.dll",
+      "bytes": 1600000,
+      "sha256": "83b41a608e438409d6520d01124f52f57409e229791c0e074e315ace7d9f4134"
+    },
+    {
+      "file": "runtime/NodaTime.dll",
+      "bytes": 498688,
+      "sha256": "3f1f71780bb3f395f9cb9d85d773024f97ce91e5d7fbbba55b24fb5235ca6722"
+    },
+    {
+      "file": "runtime/protobuf-net.Core.dll",
+      "bytes": 282624,
+      "sha256": "718a00f9977b44bb022255fc363b41032f16869ac75b39950b691076de55d9a1"
+    },
+    {
+      "file": "runtime/protobuf-net.dll",
+      "bytes": 272896,
+      "sha256": "75ba096044e1d34bc39944bad44c96f8a8025c69e7028b892f1d56add9327f33"
+    },
+    {
+      "file": "runtime/Python.Runtime.dll",
+      "bytes": 493568,
+      "sha256": "ab62dc16df115d76bdb00bf8a02a5b27b35efdce57c69e9b268bf43c8e86b4a0"
+    },
+    {
+      "file": "runtime/QuantConnect.Common.dll",
+      "bytes": 3478016,
+      "sha256": "1cf9ea833a87ae5c5febba7a88946e4dad19661e1331a46201b23f9f059bc084"
+    },
+    {
+      "file": "runtime/QuantConnect.Configuration.dll",
+      "bytes": 34816,
+      "sha256": "ded13840d7e864ed9a95332cb799a27da4a0bf8021be3b931dd6a60997940bce"
+    },
+    {
+      "file": "runtime/QuantConnect.Indicators.dll",
+      "bytes": 274944,
+      "sha256": "dc37e24236ccb714cc54a20d526b2579de4524783b124ab892155c1dae0f8d28"
+    },
+    {
+      "file": "runtime/QuantConnect.Logging.dll",
+      "bytes": 16896,
+      "sha256": "83f5eb1b25452f000d10449d2c1bd5db68d9cd6a4a6173b4bec4af43f33178b9"
+    },
+    {
+      "file": "source-decisions.json",
+      "bytes": 3251,
+      "sha256": "ceca4f78f1ccf8095c3dcf122bee7ee46eef168c859f0eb640264e5cd9799079"
+    },
+    {
+      "file": "sources/freqtrade/interface.py",
+      "bytes": 81628,
+      "sha256": "5d0faa6da85bd223bcea2281bd173c7ffc54c3a9647ae136e4ebc7d5685dea02"
+    },
+    {
+      "file": "sources/freqtrade/LICENSE",
+      "bytes": 35141,
+      "sha256": "589ed823e9a84c56feb95ac58e7cf384626b9cbf4fda2a907bc36e103de1bad2"
+    },
+    {
+      "file": "sources/freqtrade/lookahead-analysis.md",
+      "bytes": 7801,
+      "sha256": "74efd3f0fa1de61c70b99464a304fc23581b96132585ef508fa8a303592edd09"
+    },
+    {
+      "file": "sources/freqtrade/pyproject.toml",
+      "bytes": 8584,
+      "sha256": "d117adc31c7f2d5499e84aa9d20a06bb4d5e51553649339cd944f38dd7255c8d"
+    },
+    {
+      "file": "sources/freqtrade/README.md",
+      "bytes": 12770,
+      "sha256": "7d28c0afc1a8de30c50a54127e6883f105d30af0f43e572ff18b326ce9e73fb7"
+    },
+    {
+      "file": "sources/freqtrade/__init__.py",
+      "bytes": 972,
+      "sha256": "95845714fc8f4a97c0379e2d2980181e3aac0d81398b89ff134254fe69d5c817"
+    },
+    {
+      "file": "sources/lean/LICENSE",
+      "bytes": 10737,
+      "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba"
+    },
+    {
+      "file": "sources/lean/SimpleMovingAverage.cs",
+      "bytes": 3156,
+      "sha256": "9ad026997a917663a711f62ea916b35be3e0629f4966341d12ab94b83e0c856a"
+    },
+    {
+      "file": "sources/lean/StandardDeviation.cs",
+      "bytes": 2958,
+      "sha256": "b8c8cd9b70448bea9020859d68d2d2bd6b1cf39a98ec31620998f76106981e58"
+    },
+    {
+      "file": "sources/lean/Variance.cs",
+      "bytes": 3351,
+      "sha256": "dd4b7bc3aef610e10484a28ce75b819983cb2b5755d3f2e5e1f3e1b3c7bd3410"
+    }
+  ]
+}

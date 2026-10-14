@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "testOnly": true,
+  "trainingAllowed": false,
+  "deploymentAllowed": false,
+  "source": "Deterministic LCG test fixture; no market observations",
+  "recipe": {
+    "algorithm": "LCG-1664525-1013904223-u32-v1",
+    "start": "2025-01-01T00:00:00.000Z",
+    "intervalMs": 900000,
+    "bars": 160,
+    "basePrice": 100
+  },
+  "cases": [
+    {
+      "seed": 67,
+      "expected": "supertrend",
+      "preferredStrategy": "continuation",
+      "side": "BUY",
+      "symbol": "BTC/USD"
+    },
+    {
+      "seed": 1460,
+      "expected": "continuation",
+      "preferredStrategy": "stochastic",
+      "side": "SELL",
+      "symbol": "GBP/USD"
+    },
+    {
+      "seed": 1734,
+      "expected": "vwap",
+      "preferredStrategy": "continuation",
+      "side": "BUY",
+      "symbol": "BTC/USD"
+    },
+    {
+      "seed": 2106,
+      "expected": "squeeze",
+      "preferredStrategy": "continuation",
+      "side": "BUY",
+      "symbol": "XAU/USD"
+    },
+    {
+      "seed": 97,
+      "variant": "tiny-body-pullback",
+      "expected": "pullback",
+      "preferredStrategy": "stochastic",
+      "side": "BUY",
+      "symbol": "BTC/USD"
+    }
+  ]
+}

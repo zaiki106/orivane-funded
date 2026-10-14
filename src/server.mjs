@@ -28,7 +28,7 @@ export function validateProfile(p){
   try{new Intl.DateTimeFormat('en',{timeZone:p.resetTimezone}).format();}catch{throw Error('Fuseau invalide');}
   return {...defaultProfile,...p,deadlineSessions:3};
 }
-export function createApp({port=4328,dbPath=path.join(root,'runtime','funded.sqlite'),network=true,initialDatasets=null,liveFeedFactory=options=>new KrakenLiveFeed(options),derivFeedFactory=options=>new DerivLiveFeed(options),importsPath=path.join(root,'data','imports'),providerFetcher=fetchYahooSnapshot,modelPoolFactory=options=>new ModelWorkerPool(options),newsServiceFactory=options=>new NewsService(options)}={}){
+export function createApp({port=4328,dbPath=path.join(root,'runtime','funded.sqlite'),network=true,initialDatasets=null,historyPath=path.join(root,'data'),liveFeedFactory=options=>new KrakenLiveFeed(options),derivFeedFactory=options=>new DerivLiveFeed(options),importsPath=path.join(root,'data','imports'),providerFetcher=fetchYahooSnapshot,modelPoolFactory=options=>new ModelWorkerPool(options),newsServiceFactory=options=>new NewsService(options)}={}){
   mkdirSync(path.dirname(dbPath),{recursive:true});const db=new DatabaseSync(dbPath);db.exec('PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS settings (id TEXT PRIMARY KEY, value TEXT NOT NULL); CREATE TABLE IF NOT EXISTS positions (id TEXT PRIMARY KEY, payload TEXT NOT NULL); CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY, time TEXT NOT NULL, payload TEXT NOT NULL); CREATE TABLE IF NOT EXISTS day_equity (day TEXT PRIMARY KEY, equity REAL NOT NULL);');
   db.exec('CREATE TABLE IF NOT EXISTS signal_state (symbol TEXT PRIMARY KEY,payload TEXT NOT NULL)');
   const signalFollowup=new SignalFollowup(db);
@@ -76,7 +76,7 @@ export function createApp({port=4328,dbPath=path.join(root,'runtime','funded.sql
     if(d.source===DERIV_SOURCE)derivFeed?.seed(d.symbol,d);
     if(network&&d.live&&changed){const dir=path.join(path.dirname(dbPath),'feeds');mkdirSync(dir,{recursive:true});writeFileSync(path.join(dir,Buffer.from(d.symbol).toString('hex')+'.json'),JSON.stringify({...d,live:false}));}
   }
-  for(const f of readdirSync(path.join(root,'data')).filter(f=>f.endsWith('.json'))){try{install(JSON.parse(readFileSync(path.join(root,'data',f),'utf8')));}catch(e){feedErrors[f]=e.message;}}
+  for(const f of (existsSync(historyPath)?readdirSync(historyPath):[]).filter(f=>f.endsWith('.json'))){try{install(JSON.parse(readFileSync(path.join(historyPath,f),'utf8')));}catch(e){feedErrors[f]=e.message;}}
   for(const d of initialDatasets??[])install(d);
   if(network){const dir=path.join(path.dirname(dbPath),'feeds');mkdirSync(dir,{recursive:true});for(const f of readdirSync(dir).filter(f=>/^[0-9a-f]+\.json$/.test(f))){try{install(JSON.parse(readFileSync(path.join(dir,f),'utf8')));}catch{feedErrors[f]='Cache de données invalide';}}}
   function loadImports(){if(!existsSync(importsPath))return;for(const filename of readdirSync(importsPath).filter(f=>f.endsWith('.json'))){try{const d=loadProviderImport(path.join(importsPath,filename));install(d);delete feedErrors[d.symbol];}catch{feedErrors[filename]='Import fournisseur invalide ou indisponible';}}}

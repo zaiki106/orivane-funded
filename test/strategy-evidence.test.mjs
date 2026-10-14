@@ -1,6 +1,7 @@
+import {createSyntheticMarketFixture} from './helpers/synthetic-market-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+
 import {strategyEvidence} from '../src/strategy-evidence.mjs';
 import {laboratory,backtest,metrics} from '../src/engine.mjs';
 
@@ -60,7 +61,7 @@ test('invalid and internally inconsistent test statistics cannot be published',(
 });
 
 test('actual laboratory report agrees with causal net-cost backtest of the untouched final partition',()=>{
-  const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url))),lab=laboratory(dataset),chosen='breakout';
+  const dataset=createSyntheticMarketFixture(),lab=laboratory(dataset),chosen='breakout';
   const report=strategyEvidence(lab,chosen),expected=backtest(dataset.bars,chosen,{...cost,start:Math.floor(dataset.bars.length*.75)});
   assert.notEqual(report.status,'unavailable');assert.ok(expected.n>0);
   assert.equal(report.sample,expected.trades.length);assert.equal(report.wins,expected.trades.filter(t=>t.r>0).length);

@@ -1,11 +1,12 @@
+import {createSyntheticMarketFixture} from './helpers/synthetic-market-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+
 import {createApp} from '../src/server.mjs';
 import {calibrateDecision} from '../src/decision.mjs';
 
 test('the public AI contract names the selected trained classifier and exposes comparison without its internal training bank',async()=>{
-  const history=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url))),closeStart=Math.floor(Date.now()/900000)*900000-900000,shift=closeStart-Date.parse(history.bars.at(-1).time),bars=history.bars.map(b=>({...b,time:new Date(Date.parse(b.time)+shift).toISOString()}));
+  const history=createSyntheticMarketFixture(),closeStart=Math.floor(Date.now()/900000)*900000-900000,shift=closeStart-Date.parse(history.bars.at(-1).time),bars=history.bars.map(b=>({...b,time:new Date(Date.parse(b.time)+shift).toISOString()}));
   const fixture={symbol:'BTC/USD',source:'Historical AI integration fixture',timeframe:15,live:true,bars,quote:{price:bars.at(-1).close,receivedAt:new Date().toISOString()}},trained=calibrateDecision(fixture);
   assert.equal(trained.status,'estimate');assert.equal(trained.selection.candidates.length,11);
   assert.deepEqual([...new Set(trained.selection.candidates.map(c=>c.algorithm))].sort(),['multinomial-logistic','neural-network','regularized-lda','regularized-qda','weighted-knn']);

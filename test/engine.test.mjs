@@ -1,12 +1,13 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import {createSyntheticMarketFixture,createSyntheticExecutionFixture,createSyntheticPullbackFixture} from './helpers/synthetic-market-fixture.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';
 import {exitPrice,metrics,sizePosition,validateBars,backtest,laboratory,strategies,signal,indicators,setupTriggers} from '../src/engine.mjs';
 test('ambiguous candle chooses stop before target for both directions',()=>{assert.deepEqual(exitPrice({side:'BUY',stop:95,target:110},{open:100,low:94,high:111}),{price:95,reason:'Stop'});assert.deepEqual(exitPrice({side:'SELL',stop:105,target:90},{open:100,low:89,high:106}),{price:105,reason:'Stop'});});
 test('gap fills at adverse open instead of ideal stop',()=>{assert.deepEqual(exitPrice({side:'BUY',stop:95,target:110},{open:90,low:88,high:100}),{price:90,reason:'Gap stop'});});
 test('position includes costs and caps unlevered notional',()=>{const s=sizePosition({capital:100000,riskPercent:.25,entry:100,stop:99,feeBps:10,slippageBps:5});assert.equal(s.risk,250);assert.ok(Math.abs(s.quantity-250/1.3)<1e-8);assert.ok(s.notional<=100000);assert.throws(()=>sizePosition({capital:100,riskPercent:2,entry:100,stop:99}));});
 test('win rate denominator, net expectancy and drawdown use all closed trades',()=>{const m=metrics([{r:2},{r:-1},{r:0},{r:-1}]);assert.equal(m.n,4);assert.equal(m.winRate,25);assert.equal(m.expectancy,0);assert.equal(m.profitFactor,1);assert.equal(m.maxDrawdownR,2);assert.ok(m.winInterval[0]<25&&m.winInterval[1]>25);assert.equal(metrics([]).winRate,null);});
 test('rejects future, duplicate and impossible candles',()=>{const b={time:'2026-01-01T00:00:00Z',open:100,high:101,low:99,close:100,volume:1};assert.equal(validateBars([b]).length,1);assert.throws(()=>validateBars([b,b]));assert.throws(()=>validateBars([{...b,high:90}]));assert.throws(()=>validateBars([{...b,time:'2099-01-01T00:00:00Z'}]));});
-const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url)));
-test('backtest is causal and charges transaction costs',()=>{const original=backtest(dataset.bars,'breakout',{end:400}),modified=structuredClone(dataset.bars);for(let i=400;i<modified.length;i++)for(const k of ['open','high','low','close'])modified[i][k]*=3;assert.deepEqual(backtest(modified,'breakout',{end:400}),original);const gross=backtest(dataset.bars,'breakout',{feeBps:0,slippageBps:0}),net=backtest(dataset.bars,'breakout',{feeBps:2,slippageBps:2});assert.ok(gross.n>0);assert.equal(gross.n,net.n);assert.ok(net.totalR<gross.totalR);for(const t of net.trades)assert.ok(Date.parse(t.exitTime)>=Date.parse(t.time));});
+const dataset=createSyntheticMarketFixture();
+test('backtest is causal and charges transaction costs',()=>{const original=backtest(dataset.bars,'breakout',{end:400}),modified=structuredClone(dataset.bars);for(let i=400;i<modified.length;i++)for(const k of ['open','high','low','close'])modified[i][k]*=3;assert.deepEqual(backtest(modified,'breakout',{end:400}),original);const executionBars=createSyntheticExecutionFixture(),gross=backtest(executionBars,'breakout',{feeBps:0,slippageBps:0}),net=backtest(executionBars,'breakout',{feeBps:2,slippageBps:2});assert.ok(gross.n>0);assert.equal(gross.n,net.n);assert.ok(net.totalR<gross.totalR);for(const t of net.trades)assert.ok(Date.parse(t.exitTime)>=Date.parse(t.time));});
 test('final test data cannot alter the strategy selected on validation',()=>{const first=laboratory(dataset),changed=structuredClone(dataset);for(let i=Math.floor(changed.bars.length*.75);i<changed.bars.length;i++)for(const k of ['open','high','low','close'])changed.bars[i][k]*=2;const second=laboratory(changed);assert.equal(first.selected,second.selected);assert.deepEqual(first.results.map(r=>r.validation),second.results.map(r=>r.validation));for(const r of first.results)if(r.id===first.selected)assert.ok(r.validation.n>=20&&r.validation.expectancy>0);});
 test('thirty-six real strategy rules expose actual checks and criteria readiness',()=>{
   assert.equal(strategies.length,66);
@@ -70,8 +71,9 @@ test('every strategy is causal before a future boundary, including the new cross
   for(const s of strategies)assert.deepEqual(backtest(altered,s.id,{end:400}),backtest(dataset.bars,s.id,{end:400}),s.id);
 });
 
-test('all fourteen original strategies find both directions in the fixed historical dataset',()=>{
-  for(const s of strategies.filter(s=>['pullback','breakout','reversion','ema-cross','macd','rsi-recovery','squeeze','vwap','supertrend','stochastic','inside-bar','liquidity-sweep','continuation','keltner-reentry'].includes(s.id))){const observed=new Set();for(let i=60;i<dataset.bars.length;i++){observed.add(signal(dataset.bars.slice(0,i+1),s.id).side);if(observed.has('BUY')&&observed.has('SELL'))break;}assert.ok(observed.has('BUY')&&observed.has('SELL'),s.id);}
+test('all fourteen original strategies find both directions in independent synthetic fixtures',()=>{
+  const fixtures={...strategyFixtures,...expandedFixtures,pullback:createSyntheticPullbackFixture(),breakout:createSyntheticExecutionFixture().slice(0,61),reversion:candles([...Array(60).fill(100),96,98.6])};
+  for(const s of strategies.filter(s=>['pullback','breakout','reversion','ema-cross','macd','rsi-recovery','squeeze','vwap','supertrend','stochastic','inside-bar','liquidity-sweep','continuation','keltner-reentry'].includes(s.id))){const observed=new Set();for(const bars of [fixtures[s.id],reflected(fixtures[s.id])]){observed.add(signal(bars,s.id).side);}assert.ok(observed.has('BUY')&&observed.has('SELL'),s.id);}
 });
 
 const expandedFixtures={

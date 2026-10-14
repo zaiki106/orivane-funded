@@ -1,8 +1,9 @@
+import {createSyntheticMarketFixture} from './helpers/synthetic-market-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+
 import {calibrateDecision,classificationSamples,predictMarketClass} from '../src/decision.mjs';
-const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url)));
+const dataset=createSyntheticMarketFixture();
 const options={classCalibration:true,iterations:30};
 const model=calibrateDecision(dataset,options);
 test('held-out prices cannot change class calibration, classifier selection or fitted parameters',()=>{

@@ -12,6 +12,8 @@
 **/.vercel/
 orivane-data/
 **/orivane-data/
+data/
+**/data/
 *.zip
 *.zip.part*
 *.parquet

@@ -1,12 +1,13 @@
+import {createSyntheticMarketFixture} from './helpers/synthetic-market-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+
 import {routeStrategy,calibrateDecision,decide,aggregateH1,higherTimeframe,labelOutcome,classificationSamples,predictMarketClass,classes,featureNames,decisionVersion} from '../src/decision.mjs';
 import {signal,strategies,indicators} from '../src/engine.mjs';
 import {fitRegularizedQDA} from '../src/regularized-qda.mjs';
 import {fitNeuralNetwork,predictNeuralNetwork} from '../src/neural-network.mjs';
 import {fitRegularizedLDA,predictRegularizedLDA} from '../src/regularized-lda.mjs';
-const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url)));
+const dataset=createSyntheticMarketFixture();
 const model=calibrateDecision(dataset);
 
 test('LDA parameters fit train only; calibration selects the variant and separate test exposes stability',()=>{

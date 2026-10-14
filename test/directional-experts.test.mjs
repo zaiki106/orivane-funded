@@ -1,9 +1,10 @@
+import {createSyntheticMarketFixture} from './helpers/synthetic-market-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+
 import {calibrateDecision,modelForDirection,predictMarketClass,decide} from '../src/decision.mjs';
 import {assessDirection,applyModelAssessment} from '../src/model-assessment.mjs';
-const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url))),options={boosting:true,classCalibration:true,directionalExperts:true,iterations:30},model=calibrateDecision(dataset,options);
+const dataset=createSyntheticMarketFixture(),options={boosting:true,classCalibration:true,directionalExperts:true,iterations:30},model=calibrateDecision(dataset,options);
 test('each direction uses one classifier selected by its own calibration loss, with normalized probabilities',()=>{
  assert.equal(model.expertSelection.partition,'calibration');assert.equal(model.expertSelection.holdoutUsed,false);assert.equal(model.expertSelection.candidates.length,12);
  for(const direction of ['UP','DOWN']){const e=modelForDirection(model,direction),minimum=Math.min(...model.expertSelection.candidates.map(c=>c[direction]));

@@ -1,8 +1,9 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import {createSyntheticMarketFixture} from './helpers/synthetic-market-fixture.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';
 import {calibrateDecision,classes,featureNames,decide} from '../src/decision.mjs';
 import {fitBoostedStumps,boostingAlgorithm} from '../src/boosted-stumps.mjs';
 import {classificationSamples} from '../src/decision.mjs';
-const dataset=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url))),options={boosting:true,classCalibration:true,iterations:30},model=calibrateDecision(dataset,options);
+const dataset=createSyntheticMarketFixture(),options={boosting:true,classCalibration:true,iterations:30},model=calibrateDecision(dataset,options);
 test('six model families compete only on calibration, with an independently trained boosted classifier',()=>{
  assert.equal(new Set(model.selection.candidates.map(c=>c.algorithm)).size,6);assert.equal(model.selection.candidates.length,12);
  const train=classificationSamples(dataset.bars).filter(r=>r.index<model.split.train.end&&r.labelEndIndex<model.split.train.end);

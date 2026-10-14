@@ -1,8 +1,9 @@
+import {createSyntheticMarketFixture} from './helpers/synthetic-market-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+
 import {backtest} from '../src/engine.mjs';
-const bars=JSON.parse(readFileSync(new URL('../data/QQQ.json',import.meta.url))).bars.slice(0,130);
+const bars=createSyntheticMarketFixture().bars.slice(0,130);
 test('closed-history contexts are reused across strategies without changing trades',()=>{
   const cache={bars,values:new Map()};
   for(const strategy of ['continuation','ema-cross','breakout']){

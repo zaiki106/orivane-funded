@@ -4,6 +4,7 @@
 **/node_modules/
 **/.venv/
 **/.qlib-venv/
+**/.data-venv/
 **/__pycache__/
 **/*.pyc
 **/.pytest_cache/
@@ -18,3 +19,5 @@ data/
 *.zip.part*
 *.parquet
 *.duckdb
+/work/
+/feeds/

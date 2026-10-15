@@ -1,5 +1,9 @@
 # Orivane — terminal et laboratoire, version 12
 
+## Extension Intelligence locale
+
+`npm run intelligence -- catalog` décrit les capacités ajoutées : six variantes de stratégies de recherche, régimes k-means, quatre modèles probabilistes comparés chronologiquement, ensemble adaptatif, dérive, incertitude conformale et risque de portefeuille. `npm run intelligence -- audit` examine les preuves déjà livrées. Les expériences restent en recherche et ne promeuvent aucun signal. Utilisation, contrats et limites : [research/INTELLIGENCE.md](research/INTELLIGENCE.md).
+
 Terminal personnel de recherche et de paper trading. Les cinq marchés sont BTC/USD, EUR/USD, GBP/USD, XAU/USD et l’indice NDX. Le terminal ne transmet aucun ordre réel.
 
 ## Téléphone et ordinateur

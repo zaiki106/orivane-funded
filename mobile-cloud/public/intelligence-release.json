@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "version": "intelligence-mobile3",
+  "requiresPC": false,
+  "generatedAt": "2026-10-15T10:30:59.742Z",
+  "modules": {
+    "mobile-intelligence.mjs": "2adc46d6c56e9567e57a20e58ff1859759f920555a499c91972800f29baad5ec",
+    "intelligence-ai.mjs": "86b20a2db8b7095e29555738df2904cff6f840c7d9497a3136506b9477d5adc9",
+    "intelligence-strategies.mjs": "d6d425155b753a3350033e3b4b37b54bc3cdff6c68dc6fb7cfcd3fe6753d0ef5",
+    "price-research.mjs": "6552be2d733196478dfc9ab2137ff55eff6edf3ff567afd059f676d9a72d58ad",
+    "market-analysis.mjs": "d0dfc27ff1eef6e8c17d5164ac5050a3d09c0e89795ddea43173ef1beae31f45",
+    "kraken-history.mjs": "d2ef1cce53dfc2060f417d9239fb9456c54a55c4ba9fc68029c21938e94e4971"
+  }
+}

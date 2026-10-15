@@ -1,0 +1,1144 @@
+{
+  "schemaVersion": 1,
+  "kind": "orivane-intelligence-experiment",
+  "version": "orivane-intelligence-research-v1",
+  "code": {
+    "intelligence-cli.mjs": "6ae4bbb37bf2ebd346422d81d94c6e36c4e91314f90a70e980914e51af9e534b",
+    "intelligence-research.mjs": "0fdb91636116da235a22073cc46db0f2623bac90030db05f44a45a6247735072",
+    "intelligence-learning.mjs": "8014ff6723221a9e693a5e8fa737e7b6d5bee3d4157e3fd9ba9c0afa4174ef69",
+    "intelligence-ai.mjs": "86b20a2db8b7095e29555738df2904cff6f840c7d9497a3136506b9477d5adc9",
+    "intelligence-strategies.mjs": "e7e14cb3f042440585dcf6539f5ce2a23340377ddfe91fc6d104ae509f5e15d6",
+    "intelligence-risk.mjs": "6cc06e5677749036bb77b7f98c34e0ad778ed3be8ebb409b5304a0bd4bc30d98",
+    "intelligence-jobs.mjs": "6ea5de4ff246bf58579e03a69fb93fe7aa7d74690c4e653b2b5f351c72ab6e66",
+    "trade-outcome.mjs": "84d9452dd4f2d7b053b1309f14f0fa5599c900565f84832a9b7cd9c072c7a83c",
+    "execution-plan.mjs": "72af5eeaf2b36a25edbdc6d0ae4688d815c4e00deb250b32da1ab94d60b6b10a",
+    "cost-policy.mjs": "64f0dae4f1b5873e27c86562ecd69efcdbe976775c4379fd738bd319ef30c2f1",
+    "engine.mjs": "0c7bb09586bcf9a6d4ad9ec5471af1564c558c597847277fcbc7029a53b40528"
+  },
+  "configuration": {
+    "command": "real-provider-smoke",
+    "asOf": 1792057151494,
+    "responseSha256": "06cbdb7ea269076f2bf85431ef6eff61ccfb9c63c46e2d78d17096bcd8eb6b27"
+  },
+  "report": {
+    "schemaVersion": 1,
+    "kind": "intelligence-research",
+    "version": "orivane-intelligence-research-v1",
+    "strategyVersion": "orivane-intelligence-strategies-v1",
+    "learnerVersion": "orivane-binary-research-v1",
+    "source": "Kraken public · spot",
+    "symbol": "BTC/USD",
+    "sourceSha256": "320802fafeca6609a0f7b429088a0109bd91b5776a2fd91da952b3e61932e1e2",
+    "asOf": 1792057151494,
+    "testOnly": false,
+    "status": "insufficient",
+    "policy": {
+      "researchOnly": true,
+      "paperPromotion": false,
+      "realTradingAuthorized": false,
+      "confidenceUnchanged": true,
+      "selectionUsesTest": false,
+      "entryPolicy": "next-closed-bar-boundary-v1",
+      "embargoMs": 14400000,
+      "cost": {
+        "feeBps": 10,
+        "slippageBps": 5,
+        "assumption": true
+      },
+      "dependence": "Strategies can share timestamps; counts are not independent observations."
+    },
+    "bars": 712,
+    "examples": 54,
+    "diagnostics": {
+      "setups": 73,
+      "invalidPlans": 18,
+      "censored": 1,
+      "contextUnavailable": 0
+    },
+    "partitions": {
+      "trainEndMs": 1791736200000,
+      "selectionEndMs": 1791864000000,
+      "calibrationEndMs": 1791960300000,
+      "testEndMs": 1792056600000,
+      "counts": {
+        "train": 11,
+        "selection": 16,
+        "calibration": 10,
+        "test": 9
+      },
+      "excluded": 8
+    },
+    "regimes": {
+      "status": "fitted",
+      "algorithm": "standardized-kmeans-v1",
+      "dimension": 10,
+      "samples": 236,
+      "clusters": 3,
+      "iterations": 13,
+      "converged": true,
+      "scaler": {
+        "mean": [
+          0.07732799688982811,
+          0.23592452877930878,
+          0.001207751923504511,
+          0.47552061397542733,
+          0.16320276335211928,
+          -0.2879575121288861,
+          1,
+          0.07512387446003822,
+          0.04522790830448911,
+          -0.12016766977551546
+        ],
+        "scale": [
+          0.7725335266613043,
+          1.3499365794378082,
+          0.0006757116633874611,
+          1.0670838384654981,
+          0.12071413793417526,
+          0.7874915412465998,
+          1,
+          0.773308472846631,
+          0.7011782562234116,
+          0.7013296089932456
+        ]
+      },
+      "centroids": [
+        [
+          2.9102972465545816,
+          3.4094588007916387,
+          0.49965549304972645,
+          3.4580561929727596,
+          2.7219244282368655,
+          2.360828312305951,
+          0,
+          2.8890793642302155,
+          -0.719092057996505,
+          -0.8705741376427646
+        ],
+        [
+          -0.5219149837518176,
+          -0.4928747459978469,
+          0.14732271801504437,
+          -0.503388680520847,
+          -0.132621734088565,
+          0.04247782341058131,
+          0,
+          -0.521422761914511,
+          -0.21366855483452168,
+          0.05226970049441966
+        ],
+        [
+          0.5823649643096086,
+          0.5155291323515744,
+          -0.2331962958049981,
+          0.5277832385984436,
+          0.044732416258042605,
+          -0.1826942471037316,
+          0,
+          0.5827778753886245,
+          0.33792411659003113,
+          -0.02816186331805017
+        ]
+      ],
+      "counts": [
+        5,
+        135,
+        96
+      ],
+      "inertia": 1559.8338963323804
+    },
+    "drift": {
+      "status": "measured",
+      "referenceSamples": 236,
+      "currentSamples": 107,
+      "features": [
+        {
+          "index": 0,
+          "psi": 0.21651202498630878,
+          "boundaries": [
+            -2.222995127235577,
+            -0.765966743195248,
+            -0.4512981446831565,
+            -0.3142003289845196,
+            -0.10250335979958168,
+            0.031363454048240064,
+            0.17844498155728392,
+            0.3587224198086188,
+            0.5955340815031543,
+            0.8534121622461532,
+            4.366994748781402
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            23,
+            24,
+            23,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            1,
+            13,
+            12,
+            4,
+            21,
+            7,
+            6,
+            13,
+            15,
+            6,
+            9,
+            0
+          ]
+        },
+        {
+          "index": 1,
+          "psi": 0.3089317333774798,
+          "boundaries": [
+            -3.9080767994214187,
+            -1.2717949103968171,
+            -0.7589533956648805,
+            -0.49472311056058604,
+            -0.1423178055623846,
+            0.1661252109049544,
+            0.356682836386663,
+            0.7557798583606297,
+            1.1841142390888746,
+            1.6535948388693196,
+            7.045208790820273
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            23,
+            24,
+            23,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            2,
+            15,
+            18,
+            9,
+            15,
+            9,
+            2,
+            17,
+            7,
+            5,
+            8,
+            0
+          ]
+        },
+        {
+          "index": 2,
+          "psi": 5.084630765433326,
+          "boundaries": [
+            0.0005753597895439448,
+            0.0006520522519097249,
+            0.0006940891174225885,
+            0.0007362235816723262,
+            0.0008136598547928652,
+            0.0008689966998762848,
+            0.0009644422808034256,
+            0.0014422927262043648,
+            0.0017346943937628972,
+            0.0023438966318518454,
+            0.003070008329055886
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            23,
+            24,
+            23,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            26,
+            30,
+            51
+          ]
+        },
+        {
+          "index": 3,
+          "psi": 1.3059018859895615,
+          "boundaries": [
+            -2.6011734627336653,
+            -0.7810199880413196,
+            -0.3731179097836794,
+            -0.027930908326384625,
+            0.16884688108915719,
+            0.44723753462969995,
+            0.6712012284256413,
+            0.900968564583303,
+            1.2386433059510085,
+            1.7274069366547844,
+            6.29324803671298
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            23,
+            24,
+            23,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            4,
+            37,
+            30,
+            10,
+            9,
+            6,
+            5,
+            0,
+            2,
+            1,
+            3,
+            0
+          ]
+        },
+        {
+          "index": 4,
+          "psi": 0.2511547244755271,
+          "boundaries": [
+            0.0030093821915331267,
+            0.025081433224769325,
+            0.05551700208188814,
+            0.08769074262463036,
+            0.11568570600173389,
+            0.14229064613949244,
+            0.17240096708201152,
+            0.2064724919093851,
+            0.25862261413104404,
+            0.3236165422443509,
+            0.7081246971409985
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            23,
+            24,
+            23,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            2,
+            10,
+            10,
+            14,
+            7,
+            13,
+            11,
+            11,
+            5,
+            3,
+            21,
+            0
+          ]
+        },
+        {
+          "index": 5,
+          "psi": 0.18071196467703785,
+          "boundaries": [
+            -2.2277824600647307,
+            -1.2348129566209818,
+            -0.9824915045216809,
+            -0.7690718937918276,
+            -0.5109586916769717,
+            -0.338149048944438,
+            -0.1700166073752264,
+            0.12022218576911561,
+            0.2992088770320296,
+            0.8160219912211226,
+            2.0180826811605925
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            23,
+            24,
+            23,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            1,
+            13,
+            8,
+            12,
+            16,
+            11,
+            9,
+            14,
+            5,
+            11,
+            5,
+            2
+          ]
+        },
+        {
+          "index": 6,
+          "psi": 0.003947067649264743,
+          "boundaries": [
+            1
+          ],
+          "bins": 3,
+          "referenceCounts": [
+            0,
+            236,
+            0
+          ],
+          "currentCounts": [
+            0,
+            107,
+            0
+          ]
+        },
+        {
+          "index": 7,
+          "psi": 0.2257289124930298,
+          "boundaries": [
+            -2.2187146488135943,
+            -0.7740757628452224,
+            -0.45799590721812145,
+            -0.32148635986929364,
+            -0.117777883147973,
+            0.029712745940577025,
+            0.17844498155728392,
+            0.3573636227638098,
+            0.5955340815031543,
+            0.8516079082032446,
+            4.3679185894306585
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            23,
+            24,
+            23,
+            24,
+            23,
+            24,
+            24,
+            23,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            1,
+            13,
+            12,
+            3,
+            20,
+            9,
+            6,
+            12,
+            16,
+            6,
+            9,
+            0
+          ]
+        },
+        {
+          "index": 8,
+          "psi": 0.02357137615865199,
+          "boundaries": [
+            -1,
+            -0.923879532511287,
+            -0.7518398074789773,
+            -0.5000000000000004,
+            -0.2588190451025208,
+            0.06540312923014312,
+            0.3826834323650898,
+            0.6593458151000688,
+            0.8314696123025451,
+            0.9659258262890683,
+            1
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            22,
+            23,
+            25,
+            22,
+            25,
+            23,
+            25,
+            20,
+            25,
+            26,
+            0
+          ],
+          "currentCounts": [
+            0,
+            11,
+            10,
+            10,
+            9,
+            10,
+            9,
+            10,
+            11,
+            15,
+            12,
+            0
+          ]
+        },
+        {
+          "index": 9,
+          "psi": 0.03567001596386245,
+          "boundaries": [
+            -1,
+            -0.9659258262890683,
+            -0.8660254037844388,
+            -0.7071067811865479,
+            -0.5000000000000004,
+            -0.25881904510252063,
+            0.06540312923014327,
+            0.38268343236508984,
+            0.7071067811865476,
+            0.9238795325112868,
+            1
+          ],
+          "bins": 12,
+          "referenceCounts": [
+            0,
+            21,
+            24,
+            24,
+            24,
+            21,
+            27,
+            23,
+            24,
+            24,
+            24,
+            0
+          ],
+          "currentCounts": [
+            0,
+            7,
+            8,
+            8,
+            12,
+            12,
+            14,
+            10,
+            12,
+            12,
+            12,
+            0
+          ]
+        }
+      ],
+      "meanPsi": 0.763676047120405,
+      "maxPsi": 5.084630765433326,
+      "reasons": [
+        "descriptive_population_stability_index_not_a_significance_test"
+      ]
+    },
+    "strategies": [
+      {
+        "id": "intel-donchian55",
+        "name": "Donchian 55 trend breakout",
+        "n": 4,
+        "wins": 2,
+        "winRate": 50,
+        "winInterval": [
+          15.003570882017147,
+          84.99642911798286
+        ],
+        "expectancy": -0.29096688611720467,
+        "totalR": -1.1638675444688187,
+        "profitFactor": 0.4180662277655906,
+        "maxDrawdownR": 2,
+        "target": 1,
+        "expired": 1
+      },
+      {
+        "id": "intel-keltner20",
+        "name": "Keltner 20 pullback resume",
+        "n": 1,
+        "wins": 0,
+        "winRate": 0,
+        "winInterval": [
+          0,
+          79.34567085261071
+        ],
+        "expectancy": -0.6258826016585293,
+        "totalR": -0.6258826016585293,
+        "profitFactor": 0,
+        "maxDrawdownR": 0.6258826016585293,
+        "target": 0,
+        "expired": 1
+      },
+      {
+        "id": "intel-bollinger-release",
+        "name": "Bollinger squeeze confirmed release",
+        "n": 1,
+        "wins": 0,
+        "winRate": 0,
+        "winInterval": [
+          0,
+          79.34567085261071
+        ],
+        "expectancy": -1,
+        "totalR": -1,
+        "profitFactor": 0,
+        "maxDrawdownR": 1,
+        "target": 0,
+        "expired": 0
+      },
+      {
+        "id": "intel-failed20",
+        "name": "Failed 20-bar breakout reversal",
+        "n": 3,
+        "wins": 0,
+        "winRate": 0,
+        "winInterval": [
+          0,
+          56.15060804490177
+        ],
+        "expectancy": -0.8912390113233117,
+        "totalR": -2.673717033969935,
+        "profitFactor": 0,
+        "maxDrawdownR": 2.673717033969935,
+        "target": 0,
+        "expired": 1
+      },
+      {
+        "id": "intel-inside-contraction",
+        "name": "Volatility contraction inside-bar breakout",
+        "n": 0,
+        "wins": 0,
+        "winRate": null,
+        "winInterval": null,
+        "expectancy": null,
+        "totalR": 0,
+        "profitFactor": null,
+        "maxDrawdownR": 0,
+        "target": 0,
+        "expired": 0
+      },
+      {
+        "id": "intel-efficiency-momentum",
+        "name": "Efficiency-filtered momentum",
+        "n": 0,
+        "wins": 0,
+        "winRate": null,
+        "winInterval": null,
+        "expectancy": null,
+        "totalR": 0,
+        "profitFactor": null,
+        "maxDrawdownR": 0,
+        "target": 0,
+        "expired": 0
+      }
+    ],
+    "latestSetups": [
+      {
+        "side": "HOLD",
+        "strategy": "intel-donchian55",
+        "entry": null,
+        "stop": null,
+        "target": null,
+        "atr": 241.91587982388089,
+        "researchOnly": true,
+        "reason": "setup-not-confirmed",
+        "confidence": null
+      },
+      {
+        "side": "HOLD",
+        "strategy": "intel-keltner20",
+        "entry": null,
+        "stop": null,
+        "target": null,
+        "atr": 241.91587982388089,
+        "researchOnly": true,
+        "reason": "setup-not-confirmed",
+        "confidence": null
+      },
+      {
+        "side": "HOLD",
+        "strategy": "intel-bollinger-release",
+        "entry": null,
+        "stop": null,
+        "target": null,
+        "atr": 241.91587982388089,
+        "researchOnly": true,
+        "reason": "setup-not-confirmed",
+        "confidence": null
+      },
+      {
+        "side": "HOLD",
+        "strategy": "intel-failed20",
+        "entry": null,
+        "stop": null,
+        "target": null,
+        "atr": 241.91587982388089,
+        "researchOnly": true,
+        "reason": "setup-not-confirmed",
+        "confidence": null
+      },
+      {
+        "side": "HOLD",
+        "strategy": "intel-inside-contraction",
+        "entry": null,
+        "stop": null,
+        "target": null,
+        "atr": 241.91587982388089,
+        "researchOnly": true,
+        "reason": "setup-not-confirmed",
+        "confidence": null
+      },
+      {
+        "side": "HOLD",
+        "strategy": "intel-efficiency-momentum",
+        "entry": null,
+        "stop": null,
+        "target": null,
+        "atr": 241.91587982388089,
+        "researchOnly": true,
+        "reason": "setup-not-confirmed",
+        "confidence": null
+      }
+    ],
+    "costStress": {
+      "kind": "frozen-base-test-setups",
+      "selectionFrozen": true,
+      "levelsFrozen": true,
+      "reroutesAfterInvalidation": false,
+      "scenarios": [
+        {
+          "multiplier": 1,
+          "cost": {
+            "feeBps": 10,
+            "slippageBps": 5,
+            "assumption": true,
+            "feePerUnit": 0
+          },
+          "referenceSetups": 9,
+          "invalidPlans": 0,
+          "censored": 0,
+          "strategies": [
+            {
+              "id": "intel-donchian55",
+              "name": "Donchian 55 trend breakout",
+              "n": 4,
+              "wins": 2,
+              "winRate": 50,
+              "winInterval": [
+                15.003570882017147,
+                84.99642911798286
+              ],
+              "expectancy": -0.29096688611720467,
+              "totalR": -1.1638675444688187,
+              "profitFactor": 0.4180662277655906,
+              "maxDrawdownR": 2,
+              "target": 1,
+              "expired": 1
+            },
+            {
+              "id": "intel-keltner20",
+              "name": "Keltner 20 pullback resume",
+              "n": 1,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                79.34567085261071
+              ],
+              "expectancy": -0.6258826016585293,
+              "totalR": -0.6258826016585293,
+              "profitFactor": 0,
+              "maxDrawdownR": 0.6258826016585293,
+              "target": 0,
+              "expired": 1
+            },
+            {
+              "id": "intel-bollinger-release",
+              "name": "Bollinger squeeze confirmed release",
+              "n": 1,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                79.34567085261071
+              ],
+              "expectancy": -1,
+              "totalR": -1,
+              "profitFactor": 0,
+              "maxDrawdownR": 1,
+              "target": 0,
+              "expired": 0
+            },
+            {
+              "id": "intel-failed20",
+              "name": "Failed 20-bar breakout reversal",
+              "n": 3,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                56.15060804490177
+              ],
+              "expectancy": -0.8912390113233117,
+              "totalR": -2.673717033969935,
+              "profitFactor": 0,
+              "maxDrawdownR": 2.673717033969935,
+              "target": 0,
+              "expired": 1
+            },
+            {
+              "id": "intel-inside-contraction",
+              "name": "Volatility contraction inside-bar breakout",
+              "n": 0,
+              "wins": 0,
+              "winRate": null,
+              "winInterval": null,
+              "expectancy": null,
+              "totalR": 0,
+              "profitFactor": null,
+              "maxDrawdownR": 0,
+              "target": 0,
+              "expired": 0
+            },
+            {
+              "id": "intel-efficiency-momentum",
+              "name": "Efficiency-filtered momentum",
+              "n": 0,
+              "wins": 0,
+              "winRate": null,
+              "winInterval": null,
+              "expectancy": null,
+              "totalR": 0,
+              "profitFactor": null,
+              "maxDrawdownR": 0,
+              "target": 0,
+              "expired": 0
+            }
+          ]
+        },
+        {
+          "multiplier": 1.5,
+          "cost": {
+            "feeBps": 15,
+            "slippageBps": 7.5,
+            "assumption": true,
+            "feePerUnit": 0
+          },
+          "referenceSetups": 9,
+          "invalidPlans": 0,
+          "censored": 0,
+          "strategies": [
+            {
+              "id": "intel-donchian55",
+              "name": "Donchian 55 trend breakout",
+              "n": 4,
+              "wins": 1,
+              "winRate": 25,
+              "winInterval": [
+                4.558606264463622,
+                69.93639475573634
+              ],
+              "expectancy": -0.3988667151248436,
+              "totalR": -1.5954668604993745,
+              "profitFactor": 0.24198308264700857,
+              "maxDrawdownR": 2.104790571258981,
+              "target": 1,
+              "expired": 1
+            },
+            {
+              "id": "intel-keltner20",
+              "name": "Keltner 20 pullback resume",
+              "n": 1,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                79.34567085261071
+              ],
+              "expectancy": -0.6780713078316102,
+              "totalR": -0.6780713078316102,
+              "profitFactor": 0,
+              "maxDrawdownR": 0.6780713078316102,
+              "target": 0,
+              "expired": 1
+            },
+            {
+              "id": "intel-bollinger-release",
+              "name": "Bollinger squeeze confirmed release",
+              "n": 1,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                79.34567085261071
+              ],
+              "expectancy": -1,
+              "totalR": -1,
+              "profitFactor": 0,
+              "maxDrawdownR": 1,
+              "target": 0,
+              "expired": 0
+            },
+            {
+              "id": "intel-failed20",
+              "name": "Failed 20-bar breakout reversal",
+              "n": 3,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                56.15060804490177
+              ],
+              "expectancy": -0.9068058726235774,
+              "totalR": -2.720417617870732,
+              "profitFactor": 0,
+              "maxDrawdownR": 2.720417617870732,
+              "target": 0,
+              "expired": 1
+            },
+            {
+              "id": "intel-inside-contraction",
+              "name": "Volatility contraction inside-bar breakout",
+              "n": 0,
+              "wins": 0,
+              "winRate": null,
+              "winInterval": null,
+              "expectancy": null,
+              "totalR": 0,
+              "profitFactor": null,
+              "maxDrawdownR": 0,
+              "target": 0,
+              "expired": 0
+            },
+            {
+              "id": "intel-efficiency-momentum",
+              "name": "Efficiency-filtered momentum",
+              "n": 0,
+              "wins": 0,
+              "winRate": null,
+              "winInterval": null,
+              "expectancy": null,
+              "totalR": 0,
+              "profitFactor": null,
+              "maxDrawdownR": 0,
+              "target": 0,
+              "expired": 0
+            }
+          ]
+        },
+        {
+          "multiplier": 2,
+          "cost": {
+            "feeBps": 20,
+            "slippageBps": 10,
+            "assumption": true,
+            "feePerUnit": 0
+          },
+          "referenceSetups": 9,
+          "invalidPlans": 1,
+          "censored": 0,
+          "strategies": [
+            {
+              "id": "intel-donchian55",
+              "name": "Donchian 55 trend breakout",
+              "n": 4,
+              "wins": 1,
+              "winRate": 25,
+              "winInterval": [
+                4.558606264463622,
+                69.93639475573634
+              ],
+              "expectancy": -0.47809734344695953,
+              "totalR": -1.9123893737878381,
+              "profitFactor": 0.1368186377761547,
+              "maxDrawdownR": 2.2155128197634855,
+              "target": 1,
+              "expired": 1
+            },
+            {
+              "id": "intel-keltner20",
+              "name": "Keltner 20 pullback resume",
+              "n": 1,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                79.34567085261071
+              ],
+              "expectancy": -0.7174302436537126,
+              "totalR": -0.7174302436537126,
+              "profitFactor": 0,
+              "maxDrawdownR": 0.7174302436537126,
+              "target": 0,
+              "expired": 1
+            },
+            {
+              "id": "intel-bollinger-release",
+              "name": "Bollinger squeeze confirmed release",
+              "n": 1,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                79.34567085261071
+              ],
+              "expectancy": -1,
+              "totalR": -1,
+              "profitFactor": 0,
+              "maxDrawdownR": 1,
+              "target": 0,
+              "expired": 0
+            },
+            {
+              "id": "intel-failed20",
+              "name": "Failed 20-bar breakout reversal",
+              "n": 2,
+              "wins": 0,
+              "winRate": 0,
+              "winInterval": [
+                0,
+                65.76280471103807
+              ],
+              "expectancy": -0.8777348041360632,
+              "totalR": -1.7554696082721264,
+              "profitFactor": 0,
+              "maxDrawdownR": 1.7554696082721264,
+              "target": 0,
+              "expired": 1
+            },
+            {
+              "id": "intel-inside-contraction",
+              "name": "Volatility contraction inside-bar breakout",
+              "n": 0,
+              "wins": 0,
+              "winRate": null,
+              "winInterval": null,
+              "expectancy": null,
+              "totalR": 0,
+              "profitFactor": null,
+              "maxDrawdownR": 0,
+              "target": 0,
+              "expired": 0
+            },
+            {
+              "id": "intel-efficiency-momentum",
+              "name": "Efficiency-filtered momentum",
+              "n": 0,
+              "wins": 0,
+              "winRate": null,
+              "winInterval": null,
+              "expectancy": null,
+              "totalR": 0,
+              "profitFactor": null,
+              "maxDrawdownR": 0,
+              "target": 0,
+              "expired": 0
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio": {
+      "status": "insufficient",
+      "totalStopRisk": 0,
+      "totalStopRiskPercent": 0,
+      "perSymbol": [],
+      "pairCorrelations": [],
+      "correlatedClusters": [],
+      "violations": [],
+      "scenarios": {
+        "status": "insufficient",
+        "sample": 0,
+        "losses": [],
+        "valueAtRisk95": null,
+        "expectedShortfall95": null,
+        "tailSample": 0,
+        "caveat": "Empirical worst ceil(5% × N) periods; finite sample, no coverage guarantee or forecast. Fixed entry notionals; no stops, compounding, gaps or costs. Matching periodic return semantics are required."
+      },
+      "realTradingAuthorized": false
+    },
+    "allocation": {
+      "status": "insufficient",
+      "allocations": [],
+      "budgetPercent": 2,
+      "allocatedRiskPercent": 0,
+      "unallocatedRiskPercent": 2,
+      "realTradingAuthorized": false
+    },
+    "externalModelDiagnostics": {
+      "status": "insufficient",
+      "reason": "no-external-outcome-history"
+    },
+    "models": [],
+    "hypotheses": [
+      {
+        "id": "regime-shift",
+        "reason": "Feature distributions changed; compare recent and historical calibration before retraining.",
+        "kind": "investigate"
+      },
+      {
+        "id": "insufficient-evidence",
+        "reason": "Collect independent completed outcomes before comparing or promoting a model.",
+        "kind": "evidence"
+      }
+    ],
+    "reason": "Separate chronological partitions need at least 40 training, 20 selection, 20 calibration and 20 test outcomes plus two training classes."
+  }
+}

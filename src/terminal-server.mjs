@@ -2,6 +2,7 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
+import {intelligenceCatalog,loadEvidenceAudit} from './intelligence-cli.mjs';
 
 const candidates=[new URL('../mobile-cloud/',import.meta.url),new URL('../../orivane-mobile-cloud/',import.meta.url)];
 let appRoot;
@@ -18,6 +19,11 @@ const server=http.createServer(async(req,res)=>{
   if(![`127.0.0.1:${port}`,`localhost:${port}`].includes(req.headers.host)){res.writeHead(403);res.end();return;}
   const url=new URL(req.url,`http://127.0.0.1:${port}`);
   if(url.pathname==='/health'){res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify({application:'orivane-terminal',version:'wallstreet12'}));return;}
+  if(['/research/intelligence/catalog','/research/intelligence/audit'].includes(url.pathname)){
+   const origin=req.headers.origin;if(origin&&!['http://127.0.0.1:'+port,'http://localhost:'+port].includes(origin)){res.writeHead(403);res.end();return;}
+   const result=url.pathname.endsWith('/catalog')?intelligenceCatalog():await loadEvidenceAudit();
+   res.writeHead(200,{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'});res.end(req.method==='HEAD'?undefined:JSON.stringify(result));return;
+  }
   if(url.pathname.startsWith('/cloud/')){
    const reply=await cloudData(new Request('https://data.internal'+url.pathname,{method:req.method==='HEAD'?'GET':'GET'}));
    res.writeHead(reply.status,Object.fromEntries(reply.headers));res.end(req.method==='HEAD'?undefined:Buffer.from(await reply.arrayBuffer()));return;
